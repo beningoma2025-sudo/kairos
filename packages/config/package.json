@@ -6,5 +6,9 @@
     "./eslint": "./eslint/index.js",
     "./typescript/*": "./typescript/*.json",
     "./tailwind": "./tailwind/index.ts"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.15",
+    "typescript": "^5.6.3"
   }
 }

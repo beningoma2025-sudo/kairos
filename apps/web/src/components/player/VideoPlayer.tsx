@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useCallback, useRef } from "react";
 import MuxPlayer from "@mux/mux-player-react";
 import { useProgressTracking } from "@/hooks/useProgressTracking";
 
@@ -21,41 +21,44 @@ export function VideoPlayer({
   userId,
   onEnded,
 }: VideoPlayerProps) {
-  const playerRef = useRef<HTMLElement>(null);
   const { saveProgress } = useProgressTracking(contentId, userId);
+  const lastSavedRef = useRef(0);
 
-  const handleTimeUpdate = useCallback(
-    (evt: Event) => {
-      const target = evt.target as HTMLVideoElement;
-      if (target.currentTime % 15 < 0.5) {
-        saveProgress(Math.floor(target.currentTime));
-      }
+  // Callback ref so we can attach native DOM events to the MuxPlayer element
+  const playerRef = useCallback(
+    (node: HTMLElement | null) => {
+      if (!node) return;
+
+      const handleTimeUpdate = () => {
+        const video = node.shadowRoot?.querySelector("video") ?? (node as HTMLVideoElement);
+        const current = Math.floor(video.currentTime ?? 0);
+        if (Math.abs(current - lastSavedRef.current) >= 15) {
+          lastSavedRef.current = current;
+          saveProgress(current);
+        }
+      };
+
+      const handleEnded = () => {
+        saveProgress(-1);
+        onEnded?.();
+      };
+
+      node.addEventListener("timeupdate", handleTimeUpdate);
+      node.addEventListener("ended", handleEnded);
+
+      return () => {
+        node.removeEventListener("timeupdate", handleTimeUpdate);
+        node.removeEventListener("ended", handleEnded);
+      };
     },
-    [saveProgress]
+    [saveProgress, onEnded]
   );
-
-  const handleEnded = useCallback(() => {
-    saveProgress(-1);
-    onEnded?.();
-  }, [saveProgress, onEnded]);
-
-  useEffect(() => {
-    const player = playerRef.current;
-    if (!player) return;
-
-    player.addEventListener("timeupdate", handleTimeUpdate);
-    player.addEventListener("ended", handleEnded);
-
-    return () => {
-      player.removeEventListener("timeupdate", handleTimeUpdate);
-      player.removeEventListener("ended", handleEnded);
-    };
-  }, [handleTimeUpdate, handleEnded]);
 
   return (
     <div className="relative w-full" style={{ aspectRatio: "16/9" }}>
+      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
       <MuxPlayer
-        ref={playerRef as React.RefObject<HTMLElement>}
+        ref={playerRef as any}
         playbackId={playbackId}
         streamType="on-demand"
         title={title}
