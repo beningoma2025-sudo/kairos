@@ -1,0 +1,42 @@
+{
+  "name": "@kairo/web",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@kairo/types": "workspace:*",
+    "@kairo/database": "workspace:*",
+    "@clerk/nextjs": "^6.7.3",
+    "@mux/mux-player-react": "^3.2.0",
+    "next": "14.2.18",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "stripe": "^17.4.0",
+    "@stripe/stripe-js": "^5.1.0",
+    "zustand": "^5.0.2",
+    "react-query": "^3.39.3",
+    "zod": "^3.23.8",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.5.4",
+    "lucide-react": "^0.460.0",
+    "next-themes": "^0.4.3",
+    "sonner": "^1.7.1",
+    "sentry": "^0.1.2"
+  },
+  "devDependencies": {
+    "@kairo/config": "workspace:*",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@types/node": "^22.9.3",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
+    "typescript": "^5.6.3"
+  }
+}

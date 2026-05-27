@@ -1,0 +1,424 @@
+// ============================================================
+// KAIRO — Prisma Database Schema
+// PostgreSQL · Prisma 5.x
+// ============================================================
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_DIRECT_URL")
+}
+
+// ============================================================
+// USERS & AUTH
+// ============================================================
+
+enum UserRole {
+  VIEWER
+  CREATOR
+  CHURCH_ADMIN
+  SUPER_ADMIN
+}
+
+enum SubscriptionPlan {
+  FREE
+  INDIVIDUAL
+  FAMILY
+  CHURCH
+  CREATOR
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  TRIALING
+  PAUSED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  name      String
+  avatarUrl String?
+  role      UserRole @default(VIEWER)
+
+  subscription    Subscription?
+  parentalControl ParentalControl?
+  preferences     UserPreference?
+  kidsProfiles    KidsProfile[]
+
+  watchlist    WatchlistItem[]
+  watchHistory WatchHistory[]
+  ratings      ContentRating[]
+  channel      Channel?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Subscription {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  plan   SubscriptionPlan   @default(FREE)
+  status SubscriptionStatus @default(ACTIVE)
+
+  stripeCustomerId     String?
+  stripeSubscriptionId String? @unique
+  stripePriceId        String?
+
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  cancelAtPeriodEnd  Boolean   @default(false)
+  canceledAt         DateTime?
+  trialEnd           DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("subscriptions")
+}
+
+model UserPreference {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  language            String   @default("en")
+  subtitlesEnabled    Boolean  @default(true)
+  autoplay            Boolean  @default(true)
+  denomination        String?
+  spiritualMaturity   String?
+  notificationsEnabled Boolean @default(true)
+  contentFilters      String[] @default([])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("user_preferences")
+}
+
+model ParentalControl {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  enabled        Boolean @default(false)
+  pin            String
+  maxAgeRating   String  @default("PG")
+  kidsMode       Boolean @default(false)
+  watchTimeLimit Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("parental_controls")
+}
+
+// ============================================================
+// KAIRO KIDS
+// ============================================================
+
+enum KidsAgeGroup {
+  AGE_2_5
+  AGE_6_9
+  AGE_10_13
+}
+
+model KidsProfile {
+  id           String       @id @default(cuid())
+  parentUserId String
+  parent       User         @relation(fields: [parentUserId], references: [id], onDelete: Cascade)
+
+  name              String
+  avatarUrl         String?
+  ageGroup          KidsAgeGroup
+  color             String       @default("#C9A84C")
+  watchTimeToday    Int          @default(0)
+  dailyLimitMinutes Int          @default(60)
+
+  watchHistory KidsWatchHistory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("kids_profiles")
+}
+
+model KidsWatchHistory {
+  id            String      @id @default(cuid())
+  kidsProfileId String
+  kidsProfile   KidsProfile @relation(fields: [kidsProfileId], references: [id], onDelete: Cascade)
+  contentId     String
+  content       Content     @relation(fields: [contentId], references: [id])
+
+  watchedAt       DateTime @default(now())
+  progressSeconds Int      @default(0)
+  completedAt     DateTime?
+
+  @@map("kids_watch_history")
+}
+
+// ============================================================
+// CONTENT
+// ============================================================
+
+enum ContentType {
+  MOVIE
+  SERIES
+  EPISODE
+  DOCUMENTARY
+  TEACHING
+  KIDS
+  LIVE_EVENT
+  SHORT
+}
+
+enum AgeRating {
+  G
+  PG
+  PG_13
+  TV_Y
+  TV_Y7
+  TV_G
+  TV_PG
+}
+
+enum ContentStatus {
+  DRAFT
+  PROCESSING
+  PUBLISHED
+  ARCHIVED
+  SCHEDULED
+}
+
+model Content {
+  id          String        @id @default(cuid())
+  title       String
+  description String
+  type        ContentType
+  status      ContentStatus @default(DRAFT)
+  ageRating   AgeRating     @default(PG)
+
+  thumbnailUrl String
+  backdropUrl  String?
+  trailerUrl   String?
+
+  duration      Int?
+  releaseYear   Int?
+  language      String   @default("en")
+  subtitleLangs String[] @default([])
+  tags          String[] @default([])
+
+  muxAssetId   String?
+  muxPlaybackId String?
+
+  channelId String?
+  channel   Channel? @relation(fields: [channelId], references: [id])
+
+  seriesId      String?
+  series        Series? @relation(fields: [seriesId], references: [id])
+  episodeNumber Int?
+  seasonNumber  Int?
+
+  categories Category[]
+
+  viewCount  Int     @default(0)
+  likeCount  Int     @default(0)
+  isFeatured Boolean @default(false)
+  isKids     Boolean @default(false)
+
+  publishedAt DateTime?
+  scheduledAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  watchlist    WatchlistItem[]
+  watchHistory WatchHistory[]
+  ratings      ContentRating[]
+  kidsHistory  KidsWatchHistory[]
+
+  @@index([type, status])
+  @@index([channelId])
+  @@index([seriesId])
+  @@index([isKids, status])
+  @@map("content")
+}
+
+model Series {
+  id          String @id @default(cuid())
+  title       String
+  description String
+
+  thumbnailUrl String
+  backdropUrl  String?
+  ageRating    AgeRating @default(PG)
+  isComplete   Boolean   @default(false)
+  totalSeasons Int       @default(1)
+
+  channelId String?
+  channel   Channel? @relation(fields: [channelId], references: [id])
+
+  episodes Content[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("series")
+}
+
+model Category {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  name        String
+  description String?
+  iconUrl     String?
+  sortOrder   Int     @default(0)
+
+  parentId String?
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryHierarchy")
+
+  content Content[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("categories")
+}
+
+model ContentRating {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contentId String
+  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  rating    Int
+  createdAt DateTime @default(now())
+
+  @@unique([userId, contentId])
+  @@map("content_ratings")
+}
+
+// ============================================================
+// LIVE STREAMING
+// ============================================================
+
+enum LiveStatus {
+  SCHEDULED
+  LIVE
+  ENDED
+  CANCELED
+}
+
+model LiveEvent {
+  id          String     @id @default(cuid())
+  title       String
+  description String
+  thumbnailUrl String
+  status      LiveStatus @default(SCHEDULED)
+
+  scheduledStartAt DateTime
+  actualStartAt    DateTime?
+  endedAt          DateTime?
+
+  muxLiveStreamId String?
+  muxStreamKey    String?
+  muxPlaybackId   String?
+
+  channelId String?
+  channel   Channel? @relation(fields: [channelId], references: [id])
+
+  isRecorded      Boolean @default(true)
+  replayContentId String?
+
+  viewerCount     Int @default(0)
+  peakViewerCount Int @default(0)
+
+  tags String[] @default([])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, scheduledStartAt])
+  @@index([channelId])
+  @@map("live_events")
+}
+
+// ============================================================
+// CHANNELS (Church Partner Portal)
+// ============================================================
+
+model Channel {
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique
+  description String?
+  logoUrl     String?
+  bannerUrl   String?
+  websiteUrl  String?
+  denomination String?
+
+  adminUserId String @unique
+  admin       User   @relation(fields: [adminUserId], references: [id])
+
+  stripeAccountId String?
+
+  subscriberCount Int     @default(0)
+  isVerified      Boolean @default(false)
+  plan            SubscriptionPlan @default(CHURCH)
+
+  content    Content[]
+  series     Series[]
+  liveEvents LiveEvent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("channels")
+}
+
+// ============================================================
+// WATCHLIST & HISTORY
+// ============================================================
+
+model WatchlistItem {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contentId String
+  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  addedAt DateTime @default(now())
+
+  @@unique([userId, contentId])
+  @@index([userId])
+  @@map("watchlist_items")
+}
+
+model WatchHistory {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contentId String
+  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  watchedAt       DateTime  @default(now())
+  progressSeconds Int       @default(0)
+  completedAt     DateTime?
+
+  @@unique([userId, contentId])
+  @@index([userId, watchedAt(sort: Desc)])
+  @@map("watch_history")
+}

@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 4%;
+    --foreground: 0 0% 98%;
+    --muted: 240 6% 10%;
+    --muted-foreground: 240 5% 65%;
+    --border: 240 6% 12%;
+    --input: 240 6% 12%;
+    --ring: 43 57% 55%;
+    --radius: 0.5rem;
+  }
+
+  * {
+    box-sizing: border-box;
+    border-color: hsl(var(--border));
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #0A0A0F;
+    color: #fff;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0A0A0F;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #2A2A3A;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #C9A84C;
+  }
+}
+
+@layer components {
+  .kairo-gradient {
+    background: linear-gradient(135deg, #0A0A0F 0%, #1A0A2E 100%);
+  }
+
+  .gold-gradient {
+    background: linear-gradient(135deg, #C9A84C 0%, #E8C97A 100%);
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-kairo-gold/10;
+  }
+
+  .btn-primary {
+    @apply bg-kairo-gold hover:bg-kairo-gold-light text-kairo-dark font-semibold
+           px-6 py-3 rounded-lg transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-kairo-gold focus:ring-offset-2
+           focus:ring-offset-kairo-dark disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-transparent border border-white/20 hover:border-kairo-gold hover:text-kairo-gold
+           text-white font-semibold px-6 py-3 rounded-lg transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-kairo-gold focus:ring-offset-2
+           focus:ring-offset-kairo-dark;
+  }
+
+  .content-card {
+    @apply relative rounded-xl overflow-hidden bg-kairo-dark-card border border-kairo-dark-border
+           transition-all duration-300 cursor-pointer
+           hover:border-kairo-gold/40 hover:shadow-xl hover:shadow-kairo-gold/5;
+  }
+
+  .section-title {
+    @apply text-2xl font-display font-bold text-white;
+  }
+
+  .text-gold {
+    @apply text-kairo-gold;
+  }
+
+  .gradient-overlay {
+    background: linear-gradient(
+      to top,
+      rgba(10, 10, 15, 1) 0%,
+      rgba(10, 10, 15, 0.8) 40%,
+      rgba(10, 10, 15, 0) 100%
+    );
+  }
+}
