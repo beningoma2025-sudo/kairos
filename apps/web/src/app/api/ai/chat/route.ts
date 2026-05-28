@@ -2,7 +2,10 @@ import { auth } from "@clerk/nextjs/server";
 import OpenAI from "openai";
 import { z } from "zod";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// Lazy init — avoids build-time missing env var error
+function getOpenAI() {
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+}
 
 const bodySchema = z.object({
   messages: z
@@ -57,6 +60,7 @@ export async function POST(req: Request) {
     return new Response("Invalid request", { status: 400 });
   }
 
+  const openai = getOpenAI();
   const stream = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
