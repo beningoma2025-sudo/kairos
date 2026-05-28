@@ -16,16 +16,6 @@
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "clean": "turbo run clean && rm -rf node_modules"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@clerk/shared",
-      "@prisma/client",
-      "@prisma/engines",
-      "@sentry/cli",
-      "esbuild",
-      "prisma"
-    ]
-  },
   "devDependencies": {
     "turbo": "^2.3.0",
     "prettier": "^3.3.3",

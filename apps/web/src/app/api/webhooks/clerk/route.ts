@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import { Webhook } from "svix";
+import { createHmac, timingSafeEqual } from "crypto";
 import { prisma } from "@kairo/database";
 
 interface ClerkUserEvent {
@@ -12,6 +12,41 @@ interface ClerkUserEvent {
     image_url: string;
   };
   type: string;
+}
+
+function verifyClerkWebhook(
+  payload: string,
+  svixId: string,
+  svixTimestamp: string,
+  svixSignature: string,
+  secret: string
+): boolean {
+  // Reject events older than 5 minutes
+  const ts = parseInt(svixTimestamp, 10);
+  if (Math.abs(Date.now() / 1000 - ts) > 300) return false;
+
+  // Decode secret (strip "whsec_" prefix, then base64-decode)
+  const secretBytes = Buffer.from(secret.replace(/^whsec_/, ""), "base64");
+
+  // Compute expected HMAC-SHA256 signature
+  const toSign = `${svixId}.${svixTimestamp}.${payload}`;
+  const expected = createHmac("sha256", secretBytes)
+    .update(toSign, "utf-8")
+    .digest("base64");
+
+  // svix-signature is space-separated, each prefixed with "v1,"
+  const sigs = svixSignature
+    .split(" ")
+    .filter((s) => s.startsWith("v1,"))
+    .map((s) => s.slice(3));
+
+  return sigs.some((sig) => {
+    try {
+      return timingSafeEqual(Buffer.from(sig, "base64"), Buffer.from(expected, "base64"));
+    } catch {
+      return false;
+    }
+  });
 }
 
 export async function POST(req: Request) {
@@ -31,16 +66,15 @@ export async function POST(req: Request) {
 
   const payload = await req.text();
 
+  if (!verifyClerkWebhook(payload, svixId, svixTimestamp, svixSignature, webhookSecret)) {
+    return new Response("Invalid signature", { status: 400 });
+  }
+
   let event: ClerkUserEvent;
   try {
-    const wh = new Webhook(webhookSecret);
-    event = wh.verify(payload, {
-      "svix-id": svixId,
-      "svix-timestamp": svixTimestamp,
-      "svix-signature": svixSignature,
-    }) as ClerkUserEvent;
+    event = JSON.parse(payload) as ClerkUserEvent;
   } catch {
-    return new Response("Invalid signature", { status: 400 });
+    return new Response("Invalid JSON", { status: 400 });
   }
 
   const { type, data } = event;
@@ -49,22 +83,18 @@ export async function POST(req: Request) {
     const primaryEmail = data.email_addresses.find(
       (e) => e.id === data.primary_email_address_id
     );
-    if (!primaryEmail) {
-      return new Response("No primary email", { status: 400 });
-    }
+    if (!primaryEmail) return new Response("No primary email", { status: 400 });
 
     await prisma.user.create({
       data: {
         clerkId: data.id,
         email: primaryEmail.email_address,
-        name: [data.first_name, data.last_name].filter(Boolean).join(" ") || primaryEmail.email_address.split("@")[0]!,
+        name:
+          [data.first_name, data.last_name].filter(Boolean).join(" ") ||
+          primaryEmail.email_address.split("@")[0]!,
         avatarUrl: data.image_url || null,
-        subscription: {
-          create: { plan: "FREE", status: "ACTIVE" },
-        },
-        preferences: {
-          create: {},
-        },
+        subscription: { create: { plan: "FREE", status: "ACTIVE" } },
+        preferences: { create: {} },
       },
     });
   }
@@ -73,7 +103,6 @@ export async function POST(req: Request) {
     const primaryEmail = data.email_addresses.find(
       (e) => e.id === data.primary_email_address_id
     );
-
     await prisma.user.update({
       where: { clerkId: data.id },
       data: {
