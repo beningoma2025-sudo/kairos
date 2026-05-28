@@ -1,3 +1,6 @@
+// All pages are server-rendered (personalized content, auth-gated)
+export const dynamic = "force-dynamic";
+
 import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
