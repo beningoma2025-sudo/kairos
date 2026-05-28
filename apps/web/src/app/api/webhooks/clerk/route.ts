@@ -85,14 +85,25 @@ export async function POST(req: Request) {
     );
     if (!primaryEmail) return new Response("No primary email", { status: 400 });
 
+    const email = primaryEmail.email_address;
+
+    // Owner email is automatically SUPER_ADMIN
+    const OWNER_EMAIL = process.env.OWNER_EMAIL ?? "beningoma2025@gmail.com";
+    const isOwner = email === OWNER_EMAIL;
+
+    // Also make the very first user SUPER_ADMIN
+    const userCount = await prisma.user.count();
+    const role = isOwner || userCount === 0 ? "SUPER_ADMIN" : "VIEWER";
+
     await prisma.user.create({
       data: {
         clerkId: data.id,
-        email: primaryEmail.email_address,
+        email,
         name:
           [data.first_name, data.last_name].filter(Boolean).join(" ") ||
-          primaryEmail.email_address.split("@")[0]!,
+          email.split("@")[0]!,
         avatarUrl: data.image_url || null,
+        role: role as "SUPER_ADMIN" | "VIEWER",
         subscription: { create: { plan: "FREE", status: "ACTIVE" } },
         preferences: { create: {} },
       },

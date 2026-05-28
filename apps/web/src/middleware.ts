@@ -9,15 +9,13 @@ const isProtectedRoute = createRouteMatcher([
   "/search(.*)",
   "/account(.*)",
   "/onboarding(.*)",
+  "/admin(.*)",
+  "/watchlist(.*)",
 ]);
 
-const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
-
 export default clerkMiddleware(async (auth, req) => {
-  if (isAdminRoute(req)) {
-    await auth.protect((has) => has({ role: "org:admin" }));
-  }
-
+  // All protected routes just require authentication.
+  // Admin permission is enforced at the API/page level via the DB role (SUPER_ADMIN).
   if (isProtectedRoute(req)) {
     await auth.protect();
   }

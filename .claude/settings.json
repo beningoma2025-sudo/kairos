@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s https://api.vercel.com/v9/projects/prj_twRbJo8C1A9FXQH3R9w5dBgCljJM/env -H 'Authorization: Bearer vca_0c1D63F5V5EV5xOlF2aEFnTICcQKFJfUCvNHhaEUuoZhofhUQ51xck50')",
+      "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_KJBatpdn4EL7@ep-soft-truth-aphs42jr.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require\" DATABASE_DIRECT_URL=\"postgresql://neondb_owner:npg_KJBatpdn4EL7@ep-soft-truth-aphs42jr.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require\" npx prisma migrate deploy)",
+      "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_KJBatpdn4EL7@ep-soft-truth-aphs42jr.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require\" DATABASE_DIRECT_URL=\"postgresql://neondb_owner:npg_KJBatpdn4EL7@ep-soft-truth-aphs42jr.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require\" npx prisma db push --accept-data-loss)",
+      "Bash(curl -s -X POST https://api.vercel.com/v10/projects/prj_twRbJo8C1A9FXQH3R9w5dBgCljJM/env -H 'Authorization: Bearer vca_0c1D63F5V5EV5xOlF2aEFnTICcQKFJfUCvNHhaEUuoZhofhUQ51xck50' -H 'Content-Type: application/json' -d '{\"key\":\"CLERK_SECRET_KEY\",\"value\":\"sk_test_BBBJfmw3y0h4i1kgxINoz2s3Lp3yS5cotE0evKx74i\",\"type\":\"encrypted\",\"target\":[\"production\",\"preview\"],\"upsert\":true}')",
+      "Bash(curl -s -X POST https://api.vercel.com/v10/projects/prj_twRbJo8C1A9FXQH3R9w5dBgCljJM/env -H 'Authorization: Bearer vca_0c1D63F5V5EV5xOlF2aEFnTICcQKFJfUCvNHhaEUuoZhofhUQ51xck50' -H 'Content-Type: application/json' -d '{\"key\":\"NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY\",\"value\":\"pk_test_bGVnYWwtY2hpY2tlbi03Ny5jbGVyay5hY2NvdW50cy5kZXYk\",\"type\":\"plain\",\"target\":[\"production\",\"preview\"],\"upsert\":true}')"
+    ]
+  }
+}
