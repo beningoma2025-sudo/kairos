@@ -23,11 +23,18 @@ interface SearchInterfaceProps {
 
 export function SearchInterface({ searchParamsPromise }: SearchInterfaceProps) {
   const router = useRouter();
-  const [query, setQuery] = useState("");
+  const searchParams = useSearchParams();
+  const initialQ = searchParams.get("q") ?? "";
+  const [query, setQuery] = useState(initialQ);
   const [activeType, setActiveType] = useState<ContentType | "all">("all");
   const [results, setResults] = useState<Content[]>([]);
   const [loading, setLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  // Run search on mount if q param present
+  useEffect(() => {
+    if (initialQ) void search(initialQ, "all");
+  }, []);
 
   const search = async (q: string, type: ContentType | "all") => {
     if (!q.trim()) {

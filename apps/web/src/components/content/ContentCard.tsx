@@ -2,21 +2,50 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Play, Plus, ThumbsUp } from "lucide-react";
+import { Play, Plus, Check } from "lucide-react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import type { Content } from "@kairo/types";
 
 interface ContentCardProps {
   content: Pick<Content, "id" | "title" | "type" | "thumbnailUrl" | "duration" | "ageRating" | "isKidsContent">;
   className?: string;
+  initialSaved?: boolean;
 }
 
-export function ContentCard({ content, className }: ContentCardProps) {
+export function ContentCard({ content, className, initialSaved = false }: ContentCardProps) {
+  const [saved, setSaved] = useState(initialSaved);
+  const [pending, setPending] = useState(false);
+
+  async function toggleWatchlist(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (pending) return;
+    setPending(true);
+    const next = !saved;
+    setSaved(next); // optimistic
+    try {
+      if (next) {
+        await fetch("/api/watchlist", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contentId: content.id }),
+        });
+      } else {
+        await fetch(`/api/watchlist/${content.id}`, { method: "DELETE" });
+      }
+    } catch {
+      setSaved(!next); // revert on error
+    } finally {
+      setPending(false);
+    }
+  }
+
   return (
-    <div className={cn("content-card group", className)}>
+    <div className={cn("content-card group relative", className)}>
       <Link href={`/watch/${content.id}`}>
         {/* Thumbnail */}
-        <div className="relative aspect-video overflow-hidden">
+        <div className="relative aspect-video overflow-hidden rounded-xl">
           <Image
             src={content.thumbnailUrl}
             alt={content.title}
@@ -58,18 +87,22 @@ export function ContentCard({ content, className }: ContentCardProps) {
         </div>
       </Link>
 
-      {/* Action buttons (visible on hover) */}
-      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex gap-1">
-        <button
-          className="w-7 h-7 rounded-full bg-kairo-dark-card border border-kairo-dark-border flex items-center justify-center text-white/70 hover:text-white hover:border-kairo-gold transition-all"
-          aria-label="Add to watchlist"
-          onClick={(e) => {
-            e.preventDefault();
-          }}
-        >
-          <Plus size={13} />
-        </button>
-      </div>
+      {/* Watchlist button */}
+      <button
+        onClick={toggleWatchlist}
+        disabled={pending}
+        title={saved ? "Remove from watchlist" : "Add to watchlist"}
+        className={cn(
+          "absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center",
+          "border transition-all duration-200",
+          "opacity-0 group-hover:opacity-100",
+          saved
+            ? "bg-kairo-gold border-kairo-gold text-kairo-dark opacity-100"
+            : "bg-kairo-dark-card border-kairo-dark-border text-white/70 hover:border-kairo-gold hover:text-white"
+        )}
+      >
+        {saved ? <Check size={12} strokeWidth={3} /> : <Plus size={13} />}
+      </button>
     </div>
   );
 }

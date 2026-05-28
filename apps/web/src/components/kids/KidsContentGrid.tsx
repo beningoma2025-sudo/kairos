@@ -17,11 +17,12 @@ const AGE_GROUP_COLORS: Record<AgeGroup, string> = {
 };
 
 async function fetchKidsContent(ageGroup: AgeGroup): Promise<Content[]> {
-  const API_URL = process.env.API_URL ?? "http://localhost:4000";
+  const API_URL = process.env.API_URL ?? "http://localhost:3000";
   try {
-    const res = await fetch(`${API_URL}/api/content?kids=true&limit=12`, {
-      next: { revalidate: 300 },
-    });
+    const res = await fetch(
+      `${API_URL}/api/content?kids=true&ageGroup=${ageGroup}&limit=12`,
+      { next: { revalidate: 300 } }
+    );
     if (!res.ok) return [];
     const json = (await res.json()) as { data: Content[] };
     return json.data ?? [];

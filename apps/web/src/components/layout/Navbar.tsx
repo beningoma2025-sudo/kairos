@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
-import { Search, Bell, ChevronDown } from "lucide-react";
+import { Search, Bell, Flame, Bookmark } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import { GamificationPanel } from "@/components/gamification/GamificationPanel";
 
 const NAV_LINKS = [
   { label: "Home", href: "/browse" },
@@ -17,10 +19,21 @@ const NAV_LINKS = [
 
 export function Navbar() {
   const pathname = usePathname();
+  const [streak, setStreak] = useState<number | null>(null);
+  const [showPanel, setShowPanel] = useState(false);
+  const streakBtnRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    fetch("/api/gamification/stats")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { currentStreak: number } | null) => {
+        if (data) setStreak(data.currentStreak);
+      })
+      .catch(() => {});
+  }, [pathname]); // re-fetch when navigating
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-16">
-      {/* Gradient background that fades on scroll */}
       <div className="absolute inset-0 bg-gradient-to-b from-kairo-dark/95 to-transparent pointer-events-none" />
 
       <nav className="relative flex items-center justify-between px-8 h-full max-w-[1800px] mx-auto">
@@ -38,7 +51,8 @@ export function Navbar() {
                 href={link.href}
                 className={cn(
                   "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
-                  pathname === link.href || (link.href !== "/browse" && pathname.startsWith(link.href))
+                  pathname === link.href ||
+                    (link.href !== "/browse" && pathname.startsWith(link.href))
                     ? "text-white"
                     : "text-white/60 hover:text-white"
                 )}
@@ -50,7 +64,7 @@ export function Navbar() {
         </ul>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-4 ml-auto">
+        <div className="flex items-center gap-3 ml-auto">
           <Link
             href="/search"
             className="p-2 rounded-full text-white/70 hover:text-white transition-colors"
@@ -58,6 +72,18 @@ export function Navbar() {
           >
             <Search size={18} />
           </Link>
+
+          <Link
+            href="/watchlist"
+            className={cn(
+              "p-2 rounded-full transition-colors",
+              pathname === "/watchlist" ? "text-kairo-gold" : "text-white/70 hover:text-white"
+            )}
+            aria-label="My Watchlist"
+          >
+            <Bookmark size={18} />
+          </Link>
+
           <button
             className="p-2 rounded-full text-white/70 hover:text-white transition-colors relative"
             aria-label="Notifications"
@@ -65,8 +91,38 @@ export function Navbar() {
             <Bell size={18} />
             <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-kairo-gold rounded-full" />
           </button>
+
+          {/* Streak counter */}
+          <div className="relative">
+            <button
+              ref={streakBtnRef}
+              onClick={() => setShowPanel((v) => !v)}
+              className={cn(
+                "flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-sm font-semibold transition-all",
+                showPanel
+                  ? "bg-orange-500/20 text-orange-400 ring-1 ring-orange-500/30"
+                  : streak && streak > 0
+                  ? "bg-orange-500/10 text-orange-400 hover:bg-orange-500/20"
+                  : "bg-kairo-dark-muted text-white/40 hover:text-white/70"
+              )}
+              aria-label="Faith Journey"
+              title="Faith Journey"
+            >
+              <Flame size={14} className={cn(streak && streak > 0 ? "text-orange-400" : "text-white/30")} />
+              <span className={cn("tabular-nums", streak === null && "opacity-0")}>
+                {streak ?? 0}
+              </span>
+            </button>
+
+            {showPanel && (
+              <GamificationPanel
+                onClose={() => setShowPanel(false)}
+                anchorRef={streakBtnRef}
+              />
+            )}
+          </div>
+
           <UserButton
-            afterSignOutUrl="/"
             appearance={{
               elements: {
                 avatarBox: "w-8 h-8",

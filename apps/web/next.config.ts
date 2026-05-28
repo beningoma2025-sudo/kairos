@@ -1,7 +1,20 @@
 import type { NextConfig } from "next";
 
+// On Vercel, VERCEL_URL is set automatically.
+// Locally, API_URL defaults to the Fastify dev server.
+const API_URL =
+  process.env.API_URL ??
+  (process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000");
+
 const nextConfig: NextConfig = {
   transpilePackages: ["@kairo/ui", "@kairo/types", "@kairo/database"],
+
+  env: {
+    // Expose the resolved API_URL to server components
+    API_URL,
+  },
 
   images: {
     remotePatterns: [
@@ -25,15 +38,6 @@ const nextConfig: NextConfig = {
             value: "camera=(), microphone=(), geolocation=()",
           },
         ],
-      },
-    ];
-  },
-
-  async rewrites() {
-    return [
-      {
-        source: "/api/trpc/:path*",
-        destination: `${process.env.API_URL}/trpc/:path*`,
       },
     ];
   },
