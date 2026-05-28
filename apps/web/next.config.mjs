@@ -1,18 +1,16 @@
-import type { NextConfig } from "next";
-
 // On Vercel, VERCEL_URL is set automatically.
-// Locally, API_URL defaults to the Fastify dev server.
+// Locally, API_URL defaults to localhost:3000 (Next.js dev) or 4000 (Fastify).
 const API_URL =
   process.env.API_URL ??
   (process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
     : "http://localhost:3000");
 
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   transpilePackages: ["@kairo/ui", "@kairo/types", "@kairo/database"],
 
   env: {
-    // Expose the resolved API_URL to server components
     API_URL,
   },
 
