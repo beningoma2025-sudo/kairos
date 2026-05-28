@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { prisma } from "@kairo/database";
 import type { AgeRating, ContentStatus, ContentType } from "@kairo/database";
 import { z } from "zod";
