@@ -3,10 +3,13 @@ import { prisma } from "@kairo/database";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin-auth";
 
-const mux = new Mux({
-  tokenId: process.env.MUX_TOKEN_ID!,
-  tokenSecret: process.env.MUX_TOKEN_SECRET!,
-});
+// Lazy init — avoids build-time env var error (Next.js collects page data at build)
+function getMux() {
+  return new Mux({
+    tokenId: process.env.MUX_TOKEN_ID!,
+    tokenSecret: process.env.MUX_TOKEN_SECRET!,
+  });
+}
 
 const createSchema = z.object({
   title: z.string().min(1).max(200).trim(),
@@ -54,6 +57,7 @@ export async function POST(req: Request) {
   }
 
   // Create Mux live stream
+  const mux = getMux();
   const stream = await mux.video.liveStreams.create({
     playback_policy: ["public"],
     new_asset_settings: {

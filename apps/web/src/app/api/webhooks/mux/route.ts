@@ -1,10 +1,4 @@
 import { prisma } from "@kairo/database";
-import Mux from "@mux/mux-node";
-
-const mux = new Mux({
-  tokenId: process.env.MUX_TOKEN_ID!,
-  tokenSecret: process.env.MUX_TOKEN_SECRET!,
-});
 
 export async function POST(req: Request) {
   const body = await req.json() as {
