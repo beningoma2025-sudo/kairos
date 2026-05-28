@@ -1,6 +1,7 @@
 {
-  "buildCommand": "pnpm turbo run build --filter=@kairo/web",
-  "installCommand": "pnpm install --frozen-lockfile",
-  "outputDirectory": "apps/web/.next",
+  "rootDirectory": "apps/web",
+  "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
+  "buildCommand": "pnpm build",
+  "outputDirectory": ".next",
   "framework": "nextjs"
 }
