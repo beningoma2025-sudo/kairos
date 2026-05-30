@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
@@ -26,10 +28,15 @@ async function AdminSidebar() {
   const { userId: clerkId } = await auth();
   if (!clerkId) redirect("/sign-in");
 
-  const user = await prisma.user.findUnique({
-    where: { clerkId },
-    select: { role: true, name: true },
-  });
+  let user: { role: string; name: string } | null = null;
+  try {
+    user = await prisma.user.findUnique({
+      where: { clerkId },
+      select: { role: true, name: true },
+    });
+  } catch {
+    redirect("/browse");
+  }
 
   if (!user || !["SUPER_ADMIN", "CHURCH_ADMIN"].includes(user.role)) {
     redirect("/browse");

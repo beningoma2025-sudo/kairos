@@ -1,24 +1,34 @@
+export const dynamic = "force-dynamic";
+
 import type { Metadata } from "next";
 import { Film, Users, CreditCard, Clock, TrendingUp, Zap } from "lucide-react";
+import { prisma } from "@kairo/database";
 
 export const metadata: Metadata = { title: "Admin Dashboard | Kairo" };
 
-const API_URL = process.env.API_URL ?? "http://localhost:3000";
-
 async function getStats() {
   try {
-    const res = await fetch(`${API_URL}/api/admin/stats`, {
-      next: { revalidate: 60 },
-      headers: { "x-internal": "1" },
-    });
-    if (!res.ok) return null;
-    return res.json() as Promise<{
-      users: { total: number; newThisWeek: number };
-      content: { published: number; draft: number; processing: number };
-      subscriptions: { active: number };
-      watchMinutes: number;
-      contentByType: Record<string, number>;
-    }>;
+    const sevenDaysAgo = new Date(Date.now() - 7 * 86_400_000);
+    const [totalUsers, newUsers, contentByStatus, activeSubs, watchSecs, contentByType] =
+      await Promise.all([
+        prisma.user.count(),
+        prisma.user.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
+        prisma.content.groupBy({ by: ["status"], _count: { _all: true } }),
+        prisma.subscription.count({ where: { status: { in: ["ACTIVE", "TRIALING"] } } }),
+        prisma.watchHistory.aggregate({ _sum: { progressSeconds: true } }),
+        prisma.content.groupBy({ by: ["type"], where: { status: "PUBLISHED" }, _count: { _all: true } }),
+      ]);
+
+    const sm = Object.fromEntries(contentByStatus.map((r) => [r.status.toLowerCase(), r._count._all]));
+    const tm = Object.fromEntries(contentByType.map((r) => [r.type.toLowerCase(), r._count._all]));
+
+    return {
+      users: { total: totalUsers, newThisWeek: newUsers },
+      content: { published: sm.published ?? 0, draft: sm.draft ?? 0, processing: sm.processing ?? 0 },
+      subscriptions: { active: activeSubs },
+      watchMinutes: Math.floor((watchSecs._sum.progressSeconds ?? 0) / 60),
+      contentByType: tm,
+    };
   } catch {
     return null;
   }
