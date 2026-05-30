@@ -1,5 +1,6 @@
 import { prisma } from "@kairo/database";
-import type { ContentType, ContentSource } from "@kairo/database";
+import type { ContentType } from "@kairo/database";
+import type { ContentSource } from "@kairo/types";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin-auth";
 
