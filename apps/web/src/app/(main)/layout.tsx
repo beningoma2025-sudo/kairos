@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@kairo/database";
 import { Navbar } from "@/components/layout/Navbar";
