@@ -18,9 +18,10 @@ const NAV_LINKS = [
   { label: "Church", href: "/browse?type=teaching" },
 ] as const;
 
-export function Navbar({ isAdmin = false }: { isAdmin?: boolean }) {
+export function Navbar() {
   const pathname = usePathname();
   const [streak, setStreak] = useState<number | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [showPanel, setShowPanel] = useState(false);
   const streakBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -31,7 +32,14 @@ export function Navbar({ isAdmin = false }: { isAdmin?: boolean }) {
         if (data) setStreak(data.currentStreak);
       })
       .catch(() => {});
-  }, [pathname]); // re-fetch when navigating
+
+    fetch("/api/me")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { isAdmin: boolean } | null) => {
+        if (data) setIsAdmin(data.isAdmin);
+      })
+      .catch(() => {});
+  }, [pathname]);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-16">
