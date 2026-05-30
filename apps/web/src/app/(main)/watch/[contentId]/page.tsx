@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
-import { VideoPlayer } from "@/components/player/VideoPlayer";
+import { UniversalPlayer } from "@/components/player/UniversalPlayer";
 import { ContentMeta } from "@/components/content/ContentMeta";
 import { RelatedContent } from "@/components/content/RelatedContent";
 import { getContentById } from "@/lib/api/content";
@@ -43,10 +43,8 @@ export default async function WatchPage({ params, searchParams }: WatchPageProps
     <div className="min-h-screen bg-kairo-dark">
       {/* Player - full width, dark bg */}
       <div className="w-full bg-black">
-        <VideoPlayer
-          contentId={content.id}
-          playbackId={content.muxPlaybackId ?? ""}
-          title={content.title}
+        <UniversalPlayer
+          content={content}
           startTimeSeconds={startTime ? parseInt(startTime, 10) : undefined}
           userId={userId ?? undefined}
         />

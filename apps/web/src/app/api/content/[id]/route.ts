@@ -10,6 +10,9 @@ export async function GET(
     where: { id: params.id, status: "PUBLISHED" },
     include: {
       categories: true,
+      provider: {
+        select: { id: true, name: true, slug: true, logoUrl: true },
+      },
       channel: {
         select: { id: true, name: true, slug: true, logoUrl: true, isVerified: true },
       },

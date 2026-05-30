@@ -8,13 +8,14 @@ import {
   Radio,
   Users,
   LogOut,
-  Settings,
+  Globe,
 } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
 
 const NAV = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { label: "Content", href: "/admin/content", icon: Film },
+  { label: "Providers", href: "/admin/providers", icon: Globe },
   { label: "Live Events", href: "/admin/live", icon: Radio },
   { label: "Users", href: "/admin/users", icon: Users },
 ] as const;

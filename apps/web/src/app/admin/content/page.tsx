@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Plus, Eye, CheckCircle, Clock, Archive } from "lucide-react";
+import { Eye, CheckCircle, Clock, Archive } from "lucide-react";
 import { AdminContentTable } from "@/components/admin/AdminContentTable";
+import { ContentPageHeader } from "@/components/admin/ContentPageHeader";
 
 export const metadata: Metadata = { title: "Content | Kairo Admin" };
 
@@ -17,21 +17,7 @@ export { STATUS_STYLES };
 export default function AdminContentPage() {
   return (
     <div className="px-8 py-8 max-w-[1400px]">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-display font-bold text-white">Content Library</h1>
-          <p className="text-white/40 text-sm mt-1">Manage all published and draft content</p>
-        </div>
-        <Link
-          href="/admin/content/new"
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-kairo-gold text-kairo-dark font-semibold text-sm hover:bg-kairo-gold-light transition-colors"
-        >
-          <Plus size={16} />
-          Upload Content
-        </Link>
-      </div>
-
+      <ContentPageHeader />
       <AdminContentTable />
     </div>
   );

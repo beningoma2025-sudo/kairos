@@ -98,4 +98,11 @@
       rgba(10, 10, 15, 0) 100%
     );
   }
+
+  .input-kairo {
+    @apply w-full bg-kairo-dark-card border border-kairo-dark-border rounded-xl px-3.5 py-2.5
+           text-sm text-white placeholder:text-white/25
+           focus:outline-none focus:border-kairo-gold/60 focus:ring-1 focus:ring-kairo-gold/30
+           transition-colors;
+  }
 }

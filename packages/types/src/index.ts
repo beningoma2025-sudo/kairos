@@ -69,6 +69,15 @@ export type ContentStatus = "draft" | "processing" | "published" | "archived" | 
 
 export type ContentFilter = "faith_only" | "family_safe" | "kids_approved" | "no_violence";
 
+export type ContentSource = "MUX" | "YOUTUBE" | "VIMEO" | "API_STREAM" | "EMBED";
+
+export interface ContentProvider {
+  id: string;
+  name: string;
+  slug: string;
+  logoUrl?: string | null;
+}
+
 export interface Content {
   id: string;
   title: string;
@@ -84,8 +93,16 @@ export interface Content {
   availableSubtitles: string[];
   tags: string[];
   categories: Category[];
-  muxAssetId?: string;
-  muxPlaybackId?: string;
+  // Source
+  sourceType: ContentSource;
+  muxAssetId?: string | null;
+  muxPlaybackId?: string | null;
+  providerId?: string | null;
+  provider?: ContentProvider | null;
+  providerContentId?: string | null;
+  streamUrl?: string | null;
+  embedUrl?: string | null;
+  sourceUrl?: string | null;
   channelId?: string;
   seriesId?: string;
   episodeNumber?: number;

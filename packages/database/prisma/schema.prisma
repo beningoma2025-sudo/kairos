@@ -170,6 +170,44 @@ model KidsWatchHistory {
 }
 
 // ============================================================
+// CONTENT PROVIDERS (partenaires de contenu)
+// ============================================================
+
+enum ContentSource {
+  MUX           // Kairo héberge (upload admin)
+  YOUTUBE       // Via YouTube embed/API
+  VIMEO         // Via Vimeo embed/API
+  API_STREAM    // Stream HLS/MP4 direct du partenaire
+  EMBED         // Code embed HTML du partenaire
+}
+
+model Provider {
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique
+  type        String  // "youtube" | "vimeo" | "api" | "embed" | "rss"
+  logoUrl     String?
+  website     String?
+  description String?
+  baseUrl     String?
+
+  // Credentials (stored encrypted conceptually)
+  apiKey     String?
+  apiSecret  String?
+  embedToken String?
+
+  isActive   Boolean @default(true)
+  isVerified Boolean @default(false) // contrat signé
+
+  content Content[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("providers")
+}
+
+// ============================================================
 // CONTENT
 // ============================================================
 
@@ -220,7 +258,17 @@ model Content {
   subtitleLangs String[] @default([])
   tags          String[] @default([])
 
-  muxAssetId   String?
+  // Source du contenu
+  sourceType        ContentSource @default(MUX)
+  providerId        String?
+  provider          Provider?     @relation(fields: [providerId], references: [id])
+  providerContentId String?       // ID interne du partenaire (video ID YouTube, etc.)
+  streamUrl         String?       // URL de stream direct (HLS/MP4)
+  embedUrl          String?       // URL embed (iframe src)
+  sourceUrl         String?       // URL originale (page YouTube, Vimeo, etc.)
+
+  // Mux (uniquement pour sourceType=MUX)
+  muxAssetId    String?
   muxPlaybackId String?
 
   channelId String?
