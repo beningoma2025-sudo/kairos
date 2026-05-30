@@ -3,10 +3,10 @@ import type { UserRole } from "@kairo/database";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin-auth";
 
-const VALID_ROLES: UserRole[] = ["VIEWER", "CREATOR", "CHURCH_ADMIN", "SUPER_ADMIN"];
+const VALID_ROLES: UserRole[] = ["VIEWER", "CHURCH_ADMIN", "SUPER_ADMIN"];
 
 const bodySchema = z.object({
-  role: z.enum(["VIEWER", "CREATOR", "CHURCH_ADMIN", "SUPER_ADMIN"]),
+  role: z.enum(["VIEWER", "CHURCH_ADMIN", "SUPER_ADMIN"]),
 });
 
 export async function PATCH(
