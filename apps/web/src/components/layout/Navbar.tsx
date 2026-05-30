@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
-import { Search, Bell, Flame, Bookmark } from "lucide-react";
+import { Search, Flame, Bookmark } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { GamificationPanel } from "@/components/gamification/GamificationPanel";
+import { NotificationsPanel } from "@/components/notifications/NotificationsPanel";
 
 const NAV_LINKS = [
   { label: "Home", href: "/browse" },
@@ -84,13 +85,7 @@ export function Navbar() {
             <Bookmark size={18} />
           </Link>
 
-          <button
-            className="p-2 rounded-full text-white/70 hover:text-white transition-colors relative"
-            aria-label="Notifications"
-          >
-            <Bell size={18} />
-            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-kairo-gold rounded-full" />
-          </button>
+          <NotificationsPanel />
 
           {/* Streak counter */}
           <div className="relative">

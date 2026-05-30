@@ -20,7 +20,6 @@ datasource db {
 
 enum UserRole {
   VIEWER
-  CREATOR
   CHURCH_ADMIN
   SUPER_ADMIN
 }
@@ -54,10 +53,11 @@ model User {
   preferences     UserPreference?
   kidsProfiles    KidsProfile[]
 
-  watchlist    WatchlistItem[]
-  watchHistory WatchHistory[]
-  ratings      ContentRating[]
-  channel      Channel?
+  watchlist      WatchlistItem[]
+  watchHistory   WatchHistory[]
+  ratings        ContentRating[]
+  notifications  Notification[]
+  channel        Channel?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -435,6 +435,27 @@ model Channel {
   updatedAt DateTime @updatedAt
 
   @@map("channels")
+}
+
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // "new_content" | "live_event" | "streak" | "system"
+  title     String
+  body      String
+  link      String?
+  imageUrl  String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, read])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("notifications")
 }
 
 // ============================================================

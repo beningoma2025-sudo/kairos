@@ -9,7 +9,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </Link>
       {children}
       <p className="mt-8 text-white/30 text-xs">
-        © 2025 Kairo. All rights reserved.
+        © 2026 Kairo. All rights reserved.
       </p>
     </div>
   );

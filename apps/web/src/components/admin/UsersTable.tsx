@@ -18,9 +18,8 @@ interface User {
 
 const ROLES = [
   { value: "VIEWER",      label: "Viewer",       color: "text-white/40",  desc: "Utilisateur standard" },
-  { value: "CREATOR",     label: "Creator",      color: "text-green-400", desc: "Peut uploader du contenu" },
-  { value: "CHURCH_ADMIN",label: "Church Admin", color: "text-kairo-gold",desc: "Gère sa chaîne" },
-  { value: "SUPER_ADMIN", label: "Super Admin",  color: "text-red-400",   desc: "Accès total au panel" },
+  { value: "CHURCH_ADMIN",label: "Church Admin", color: "text-kairo-gold",desc: "Gère sa chaîne d'église" },
+  { value: "SUPER_ADMIN", label: "Super Admin",  color: "text-red-400",   desc: "Accès total au panel admin" },
 ];
 
 const PLAN_STYLE: Record<string, string> = {
@@ -28,7 +27,6 @@ const PLAN_STYLE: Record<string, string> = {
   INDIVIDUAL: "text-blue-400 bg-blue-500/10",
   FAMILY:     "text-purple-400 bg-purple-500/10",
   CHURCH:     "text-kairo-gold bg-kairo-gold/10",
-  CREATOR:    "text-green-400 bg-green-500/10",
 };
 
 function RoleSelector({ user, isSuperAdmin }: { user: User; isSuperAdmin: boolean }) {

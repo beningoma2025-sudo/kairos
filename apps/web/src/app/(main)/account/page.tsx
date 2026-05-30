@@ -24,7 +24,6 @@ const PLAN_LABELS: Record<string, { name: string; color: string; bg: string }> =
   INDIVIDUAL: { name: "Individual", color: "text-blue-400", bg: "bg-blue-500/10" },
   FAMILY: { name: "Family", color: "text-purple-400", bg: "bg-purple-500/10" },
   CHURCH: { name: "Church", color: "text-kairo-gold", bg: "bg-kairo-gold/10" },
-  CREATOR: { name: "Creator", color: "text-green-400", bg: "bg-green-500/10" },
 };
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {

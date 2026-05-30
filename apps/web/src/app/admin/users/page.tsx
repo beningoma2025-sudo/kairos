@@ -47,7 +47,6 @@ export default async function AdminUsersPage() {
         <div className="flex flex-wrap gap-3 mb-6">
           {[
             { role: "VIEWER",       color: "text-white/40",  desc: "Utilisateur standard" },
-            { role: "CREATOR",      color: "text-green-400", desc: "Peut uploader du contenu" },
             { role: "CHURCH_ADMIN", color: "text-kairo-gold",desc: "Gère sa chaîne d'église" },
             { role: "SUPER_ADMIN",  color: "text-red-400",   desc: "Accès total au panel admin" },
           ].map((r) => (

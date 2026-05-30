@@ -103,7 +103,7 @@ export async function POST(req: Request) {
           [data.first_name, data.last_name].filter(Boolean).join(" ") ||
           email.split("@")[0]!,
         avatarUrl: data.image_url || null,
-        role: role as "SUPER_ADMIN" | "VIEWER",
+        role: role as "SUPER_ADMIN" | "VIEWER" | "CHURCH_ADMIN",
         subscription: { create: { plan: "FREE", status: "ACTIVE" } },
         preferences: { create: {} },
       },
