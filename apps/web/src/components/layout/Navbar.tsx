@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
-import { Search, Flame, Bookmark } from "lucide-react";
+import { Search, Flame, Bookmark, LayoutDashboard } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { GamificationPanel } from "@/components/gamification/GamificationPanel";
@@ -18,7 +18,7 @@ const NAV_LINKS = [
   { label: "Church", href: "/browse?type=teaching" },
 ] as const;
 
-export function Navbar() {
+export function Navbar({ isAdmin = false }: { isAdmin?: boolean }) {
   const pathname = usePathname();
   const [streak, setStreak] = useState<number | null>(null);
   const [showPanel, setShowPanel] = useState(false);
@@ -116,6 +116,16 @@ export function Navbar() {
               />
             )}
           </div>
+
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-kairo-gold/10 border border-kairo-gold/20 text-kairo-gold text-xs font-semibold hover:bg-kairo-gold/20 transition-colors"
+            >
+              <LayoutDashboard size={13} />
+              Admin
+            </Link>
+          )}
 
           <UserButton
             appearance={{
