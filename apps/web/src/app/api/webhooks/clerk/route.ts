@@ -2,6 +2,17 @@ import { headers } from "next/headers";
 import { createHmac, timingSafeEqual } from "crypto";
 import { prisma } from "@kairo/database";
 
+async function setClerkRole(clerkUserId: string, role: string) {
+  await fetch(`https://api.clerk.com/v1/users/${clerkUserId}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ public_metadata: { role } }),
+  });
+}
+
 interface ClerkUserEvent {
   data: {
     id: string;
@@ -108,6 +119,8 @@ export async function POST(req: Request) {
         preferences: { create: {} },
       },
     });
+
+    await setClerkRole(data.id, role);
   }
 
   if (type === "user.updated") {

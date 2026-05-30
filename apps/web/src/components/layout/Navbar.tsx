@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
 import { Search, Flame, Bookmark, LayoutDashboard } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useUser } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { GamificationPanel } from "@/components/gamification/GamificationPanel";
 import { NotificationsPanel } from "@/components/notifications/NotificationsPanel";
@@ -20,23 +21,19 @@ const NAV_LINKS = [
 
 export function Navbar() {
   const pathname = usePathname();
+  const { user } = useUser();
   const [streak, setStreak] = useState<number | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [showPanel, setShowPanel] = useState(false);
   const streakBtnRef = useRef<HTMLButtonElement>(null);
+
+  const role = user?.publicMetadata?.role as string | undefined;
+  const isAdmin = role === "SUPER_ADMIN" || role === "CHURCH_ADMIN";
 
   useEffect(() => {
     fetch("/api/gamification/stats")
       .then((r) => (r.ok ? r.json() : null))
       .then((data: { currentStreak: number } | null) => {
         if (data) setStreak(data.currentStreak);
-      })
-      .catch(() => {});
-
-    fetch("/api/me")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data: { isAdmin: boolean } | null) => {
-        if (data) setIsAdmin(data.isAdmin);
       })
       .catch(() => {});
   }, [pathname]);

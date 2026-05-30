@@ -3,6 +3,17 @@ import type { UserRole } from "@kairo/database";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin-auth";
 
+async function setClerkRole(clerkUserId: string, role: string) {
+  await fetch(`https://api.clerk.com/v1/users/${clerkUserId}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ public_metadata: { role } }),
+  });
+}
+
 const VALID_ROLES: UserRole[] = ["VIEWER", "CHURCH_ADMIN", "SUPER_ADMIN"];
 
 const bodySchema = z.object({
@@ -40,8 +51,10 @@ export async function PATCH(
   const updated = await prisma.user.update({
     where: { id: params.id },
     data: { role: body.role as UserRole },
-    select: { id: true, name: true, email: true, role: true },
+    select: { id: true, name: true, email: true, role: true, clerkId: true },
   });
+
+  await setClerkRole(updated.clerkId, updated.role);
 
   return Response.json(updated);
 }
