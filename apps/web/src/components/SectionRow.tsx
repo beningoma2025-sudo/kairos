@@ -40,8 +40,8 @@ export default function SectionRow({ section }: Props) {
         )}
       </div>
 
-      {/* Grid — 3 / 5 / 7 colonnes */}
-      <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-7 gap-3">
+      {/* Grid — 2 / 3 / 4 / 5 colonnes comme Tubi */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
         {section.videos.map((video, i) => (
           <VideoCard key={video.id} video={video} index={i} />
         ))}
