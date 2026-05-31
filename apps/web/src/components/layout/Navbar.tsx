@@ -139,7 +139,7 @@ export function Navbar() {
     }
     if (href.includes("?type=")) return searchParams.get("type") === href.split("type=")[1];
     if (href.includes("?tag=")) return searchParams.get("tag") === href.split("tag=")[1];
-    return pathname.startsWith(href.split("?")[0]);
+    return pathname.startsWith(href.split("?")[0] ?? href);
   }
 
   return (
