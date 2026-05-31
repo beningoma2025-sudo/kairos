@@ -7,7 +7,7 @@ interface Props {
 
 export default function VideoGrid({ sections }: Props) {
   return (
-    <div className="bg-[#0f0f1a] min-h-screen">
+    <div className="bg-white min-h-screen">
       <div className="max-w-[1400px] mx-auto px-8 py-9">
         {sections.map((section) => (
           <SectionRow key={section.title} section={section} />

@@ -168,7 +168,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
     const baseUrl = tag ? `/browse?tag=${tag}` : `/browse?type=${type}`;
 
     return (
-      <div className="min-h-screen bg-[#0f0f1a] pt-24 px-8 pb-16 max-w-[1800px] mx-auto">
+      <div className="min-h-screen bg-white pt-24 px-8 pb-16 max-w-[1800px] mx-auto">
         <div className="mb-6">
           <Suspense fallback={null}>
             <GenreBar />
@@ -176,12 +176,12 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
         </div>
 
         <div className="flex items-baseline gap-4 mb-6">
-          <h1 className="text-2xl font-bold text-white">{title}</h1>
-          <span className="text-white/40 text-sm">{total} vidéos</span>
+          <h1 className="text-2xl font-bold text-[#111]">{title}</h1>
+          <span className="text-[#999] text-sm">{total} vidéos</span>
         </div>
 
         {items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-32 text-white/25">
+          <div className="flex flex-col items-center justify-center py-32 text-[#bbb]">
             <p className="text-lg mb-2">Aucun contenu dans cette catégorie</p>
             <p className="text-sm">Utilise Admin → Import Archive pour ajouter du contenu</p>
           </div>
@@ -210,7 +210,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   ]);
 
   return (
-    <div className="min-h-screen bg-[#0f0f1a]">
+    <div className="min-h-screen bg-white">
 
       <div className="pt-24 pb-8 space-y-8">
 

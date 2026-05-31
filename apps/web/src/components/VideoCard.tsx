@@ -65,7 +65,7 @@ export default function VideoCard({ video, index = 0 }: Props) {
         </div>
 
         {/* ── Title below ──────────────────────────────────── */}
-        <p className="mt-1.5 text-[12px] text-white/70 truncate leading-snug px-0.5">
+        <p className="mt-1.5 text-[12px] text-[#555] truncate leading-snug px-0.5">
           {video.title}
         </p>
 
