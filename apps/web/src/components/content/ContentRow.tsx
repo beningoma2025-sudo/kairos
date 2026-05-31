@@ -24,7 +24,7 @@ export function ContentRowClient({ title, items, linkHref, linkLabel, grid }: Co
   /* ── Grid mode (filtered category page) ──────────────────── */
   if (grid) {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-x-3 gap-y-6">
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-x-3 gap-y-5">
         {items.map((item) => (
           <ContentCard key={item.id} content={item as never} />
         ))}
@@ -99,7 +99,7 @@ export function ContentRowClient({ title, items, linkHref, linkLabel, grid }: Co
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {items.map((item) => (
-            <div key={item.id} className="flex-shrink-0 w-[175px] sm:w-[210px] md:w-[235px] lg:w-[255px]">
+            <div key={item.id} className="flex-shrink-0 w-[130px] sm:w-[155px] md:w-[170px] lg:w-[185px]">
               <ContentCard content={item as never} />
             </div>
           ))}

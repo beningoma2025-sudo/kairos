@@ -58,24 +58,24 @@ export function ContentCard({ content, className, initialSaved = false }: Conten
     <div className={cn("group", className)}>
       <Link href={`/watch/${content.id}`} className="block">
 
-        {/* ── Thumbnail ────────────────────────────────────── */}
-        <div className="relative aspect-video overflow-hidden rounded-[4px] bg-kairo-dark-card">
+        {/* ── Poster — format 2:3 comme Tubi ───────────────── */}
+        <div className="relative aspect-[2/3] overflow-hidden rounded-[5px] bg-[#1a1a2e]">
           <Image
             src={content.thumbnailUrl}
             alt={content.title}
             fill
-            className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 22vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-[1.04]"
+            sizes="(max-width: 640px) 40vw, (max-width: 1024px) 22vw, 16vw"
           />
 
-          {/* Hover: dark veil + play button */}
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-200 flex items-center justify-center">
-            <div className="w-11 h-11 rounded-full bg-white flex items-center justify-center shadow-xl opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200">
-              <Play size={17} className="text-black ml-0.5" fill="currentColor" />
+          {/* Hover: veil + play button */}
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors duration-200 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-xl opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200">
+              <Play size={18} className="text-black ml-0.5" fill="currentColor" />
             </div>
           </div>
 
-          {/* Watchlist — top-right, on hover */}
+          {/* Watchlist button — top right on hover */}
           <button
             onClick={toggleWatchlist}
             disabled={pending}
@@ -92,14 +92,13 @@ export function ContentCard({ content, className, initialSaved = false }: Conten
           </button>
         </div>
 
-        {/* ── Info below card (Tubi style) ──────────────────── */}
-        <div className="mt-2 space-y-0.5">
-          <p className="text-white text-[13px] font-medium leading-snug truncate group-hover:text-white/80 transition-colors">
+        {/* ── Info sous la carte ────────────────────────────── */}
+        <div className="mt-1.5 px-0.5">
+          <p className="text-white text-[12px] font-medium leading-snug line-clamp-2 group-hover:text-white/75 transition-colors">
             {content.title}
           </p>
-          <p className="text-white/40 text-[11px] leading-none">
-            {typeLabel}
-            {content.duration ? ` · ${formatDuration(content.duration)}` : ""}
+          <p className="text-white/40 text-[10px] mt-0.5 leading-none">
+            {typeLabel}{content.duration ? ` · ${formatDuration(content.duration)}` : ""}
           </p>
         </div>
 
