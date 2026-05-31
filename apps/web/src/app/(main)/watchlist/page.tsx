@@ -41,7 +41,7 @@ export default async function WatchlistPage() {
   });
 
   return (
-    <div className="min-h-screen bg-kairo-dark px-8 py-10 max-w-[1800px] mx-auto">
+    <div className="min-h-screen bg-white px-8 py-10 max-w-[1800px] mx-auto">
       <div className="mb-8">
         <h1 className="text-3xl font-display font-bold text-white">My Watchlist</h1>
         <p className="text-white/40 text-sm mt-1">

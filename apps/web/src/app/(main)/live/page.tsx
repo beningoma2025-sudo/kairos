@@ -25,7 +25,7 @@ export default async function LivePage() {
   const { liveNow, upcoming } = await fetchLiveData();
 
   return (
-    <div className="min-h-screen bg-kairo-dark px-8 py-10 max-w-[1800px] mx-auto">
+    <div className="min-h-screen bg-white px-8 py-10 max-w-[1800px] mx-auto">
       <div className="mb-10">
         <h1 className="text-4xl font-display font-bold text-white mb-2">Live Now</h1>
         <p className="text-white/50">Real-time faith experiences from around the world.</p>

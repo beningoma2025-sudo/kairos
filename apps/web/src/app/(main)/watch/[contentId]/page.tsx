@@ -40,7 +40,7 @@ export default async function WatchPage({ params, searchParams }: WatchPageProps
   }
 
   return (
-    <div className="min-h-screen bg-kairo-dark">
+    <div className="min-h-screen bg-white">
       {/* Player - full width, dark bg */}
       <div className="w-full bg-black">
         <UniversalPlayer

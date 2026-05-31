@@ -69,7 +69,7 @@ export default async function SeriesPage({ params }: PageProps) {
   const totalDuration = series.episodes.reduce((sum, ep) => sum + (ep.duration ?? 0), 0);
 
   return (
-    <div className="min-h-screen bg-kairo-dark">
+    <div className="min-h-screen bg-white">
       {/* Hero backdrop */}
       <div className="relative w-full h-[60vh] overflow-hidden">
         {series.backdropUrl || series.thumbnailUrl ? (

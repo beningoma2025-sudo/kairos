@@ -84,7 +84,7 @@ export default async function AccountPage() {
   const earnedBadges = stats?.badges.filter((b) => b.earned) ?? [];
 
   return (
-    <div className="min-h-screen bg-kairo-dark px-8 py-10 max-w-[1000px] mx-auto">
+    <div className="min-h-screen bg-white px-8 py-10 max-w-[1000px] mx-auto">
       <h1 className="text-3xl font-display font-bold text-white mb-8">My Account</h1>
 
       <div className="space-y-5">

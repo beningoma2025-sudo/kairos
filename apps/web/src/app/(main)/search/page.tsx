@@ -12,7 +12,7 @@ export default function SearchPage({
   searchParams: Promise<{ q?: string }>;
 }) {
   return (
-    <div className="min-h-screen bg-kairo-dark px-8 py-10 max-w-[1800px] mx-auto">
+    <div className="min-h-screen bg-white px-8 py-10 max-w-[1800px] mx-auto">
       <SearchInterface searchParamsPromise={searchParams} />
     </div>
   );
