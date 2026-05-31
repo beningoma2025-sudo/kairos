@@ -1,60 +1,28 @@
 import Link from "next/link";
 import Image from "next/image";
-import type { Content, ContentType } from "@kairo/types";
+import { getRelated } from "@/lib/data/content";
 
-interface RelatedContentProps {
-  contentId: string;
-  type: ContentType;
-}
-
-async function fetchRelated(contentId: string, type: ContentType): Promise<Content[]> {
-  const API_URL = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : (process.env.API_URL ?? "http://localhost:3000");
-  try {
-    const res = await fetch(
-      `${API_URL}/api/content?type=${type.toLowerCase()}&limit=8`,
-      { next: { revalidate: 300 } }
-    );
-    if (!res.ok) return [];
-    const json = (await res.json()) as { data: Content[] };
-    return (json.data ?? []).filter((c) => c.id !== contentId).slice(0, 6);
-  } catch {
-    return [];
-  }
-}
-
-export async function RelatedContent({ contentId, type }: RelatedContentProps) {
-  const related = await fetchRelated(contentId, type);
-
-  if (related.length === 0) return null;
+export async function RelatedContent({ contentId, type }: { contentId: string; type: string }) {
+  const items = await getRelated(contentId, type, 8);
+  if (items.length === 0) return null;
 
   return (
     <div>
       <h3 className="text-lg font-semibold text-white mb-4">More Like This</h3>
       <div className="space-y-3">
-        {related.map((item) => (
-          <Link
-            key={item.id}
-            href={`/watch/${item.id}`}
-            className="flex gap-3 p-2 rounded-lg hover:bg-kairo-dark-card transition-colors group"
-          >
-            <div className="relative flex-shrink-0 w-32 aspect-video rounded-md overflow-hidden">
-              <Image
-                src={item.thumbnailUrl}
-                alt={item.title}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-300"
-                sizes="128px"
-              />
+        {items.map((item) => (
+          <Link key={item.id} href={`/watch/${item.id}`}
+            className="flex gap-3 group hover:bg-kairo-dark-card rounded-xl p-2 transition-colors">
+            <div className="relative w-28 shrink-0 aspect-video rounded-lg overflow-hidden bg-kairo-dark-card">
+              <Image src={item.thumbnailUrl} alt={item.title} fill className="object-cover group-hover:scale-105 transition-transform" sizes="112px" />
             </div>
-            <div className="min-w-0 flex-1 py-1">
-              <p className="text-white text-sm font-medium truncate group-hover:text-kairo-gold transition-colors">
+            <div className="flex-1 min-w-0 py-1">
+              <p className="text-sm text-white font-medium line-clamp-2 group-hover:text-kairo-gold transition-colors">
                 {item.title}
               </p>
-              <p className="text-white/40 text-xs mt-0.5">
-                {item.duration
-                  ? `${Math.floor(item.duration / 60)}m`
-                  : item.type.replace("_", " ")}
-              </p>
+              {item.duration && (
+                <p className="text-xs text-white/30 mt-1">{Math.floor(item.duration / 60)}m</p>
+              )}
             </div>
           </Link>
         ))}
