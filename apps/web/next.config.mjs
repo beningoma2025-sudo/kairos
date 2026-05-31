@@ -42,6 +42,15 @@ const nextConfig = {
 
   experimental: {
     optimizePackageImports: ["lucide-react"],
+    serverComponentsExternalPackages: ["@prisma/client", ".prisma/client"],
+  },
+
+  // Prisma engine binary must be included in the output
+  outputFileTracingIncludes: {
+    "**": [
+      "./node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/.prisma/client/**",
+      "../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/.prisma/client/**",
+    ],
   },
 };
 
