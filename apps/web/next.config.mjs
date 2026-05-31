@@ -7,11 +7,6 @@ const API_URL =
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Include .prisma/client (copied pre-build) in all Lambda outputs
-  outputFileTracingIncludes: {
-    "**": ["./.prisma/client/**"],
-  },
-
   transpilePackages: ["@kairo/ui", "@kairo/types", "@kairo/database"],
 
   env: {

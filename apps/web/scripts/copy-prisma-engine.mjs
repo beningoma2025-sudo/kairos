@@ -9,7 +9,8 @@ import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const webRoot = join(__dirname, "..");
-const dest = join(webRoot, ".prisma", "client");
+// Prisma searches /var/task/apps/web/.next/server at runtime — put binary there
+const dest = join(webRoot, ".next", "server");
 
 mkdirSync(dest, { recursive: true });
 
