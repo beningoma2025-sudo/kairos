@@ -21,10 +21,10 @@ export function ContentRowClient({ title, items, linkHref, linkLabel, grid }: Co
 
   if (items.length === 0) return null;
 
-  /* ── Grid mode (category filtered view) ──────────────────── */
+  /* ── Grid mode (filtered category page) ──────────────────── */
   if (grid) {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2 sm:gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-x-3 gap-y-6">
         {items.map((item) => (
           <ContentCard key={item.id} content={item as never} />
         ))}
@@ -47,61 +47,65 @@ export function ContentRowClient({ title, items, linkHref, linkLabel, grid }: Co
   };
 
   return (
-    <section className="group/row -mx-2 px-2">
-      {/* Row header */}
-      <div className="flex items-center gap-3 mb-3 px-0">
-        <h2 className="text-white font-semibold text-base sm:text-lg tracking-tight">{title}</h2>
-        {linkHref && (
-          <Link
-            href={linkHref}
-            className="flex items-center gap-0.5 text-xs font-medium text-kairo-gold hover:text-kairo-gold-light transition-colors opacity-0 group-hover/row:opacity-100 duration-200"
-          >
-            {linkLabel ?? "Voir tout"} <ChevronRight size={13} className="mt-px" />
+    <section className="group/row">
+
+      {/* ── Row header — Tubi style: "Title >" ─────────────── */}
+      <div className="flex items-center mb-3">
+        {linkHref ? (
+          <Link href={linkHref} className="flex items-center gap-0.5 group/title">
+            <h2 className="text-white font-bold text-[15px] sm:text-base tracking-tight group-hover/title:text-white/80 transition-colors">
+              {title}
+            </h2>
+            <ChevronRight
+              size={17}
+              className="text-white/50 group-hover/title:text-white/80 mt-px transition-colors"
+            />
           </Link>
+        ) : (
+          <h2 className="text-white font-bold text-[15px] sm:text-base tracking-tight">{title}</h2>
         )}
       </div>
 
-      {/* Scroll container with edge arrows */}
+      {/* ── Scroll strip ───────────────────────────────────── */}
       <div className="relative">
 
-        {/* Left arrow + fade */}
-        <div className={`absolute left-0 top-0 bottom-0 z-20 flex items-center transition-opacity duration-200 ${canScrollLeft ? "opacity-0 group-hover/row:opacity-100" : "opacity-0 pointer-events-none"}`}>
-          <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-kairo-dark via-kairo-dark/70 to-transparent pointer-events-none" />
+        {/* Left arrow */}
+        {canScrollLeft && (
           <button
             onClick={() => scroll("left")}
             aria-label="Défiler à gauche"
-            className="relative z-10 ml-1 w-9 h-9 rounded-full bg-kairo-dark-card/95 border border-kairo-dark-border text-white flex items-center justify-center hover:border-kairo-gold hover:text-kairo-gold transition-all shadow-xl"
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 z-20 w-8 h-8 rounded-full bg-[#1a1a2e]/90 border border-white/10 text-white flex items-center justify-center hover:bg-[#1a1a2e] hover:border-white/30 transition-all shadow-lg opacity-0 group-hover/row:opacity-100 duration-200"
           >
-            <ChevronLeft size={18} />
+            <ChevronLeft size={16} />
           </button>
-        </div>
+        )}
 
-        {/* Right arrow + fade */}
-        <div className={`absolute right-0 top-0 bottom-0 z-20 flex items-center justify-end transition-opacity duration-200 ${canScrollRight ? "opacity-0 group-hover/row:opacity-100" : "opacity-0 pointer-events-none"}`}>
-          <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-kairo-dark via-kairo-dark/70 to-transparent pointer-events-none" />
+        {/* Right arrow */}
+        {canScrollRight && (
           <button
             onClick={() => scroll("right")}
             aria-label="Défiler à droite"
-            className="relative z-10 mr-1 w-9 h-9 rounded-full bg-kairo-dark-card/95 border border-kairo-dark-border text-white flex items-center justify-center hover:border-kairo-gold hover:text-kairo-gold transition-all shadow-xl"
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 z-20 w-8 h-8 rounded-full bg-[#1a1a2e]/90 border border-white/10 text-white flex items-center justify-center hover:bg-[#1a1a2e] hover:border-white/30 transition-all shadow-lg opacity-0 group-hover/row:opacity-100 duration-200"
           >
-            <ChevronRight size={18} />
+            <ChevronRight size={16} />
           </button>
-        </div>
+        )}
 
         {/* Cards strip */}
         <div
           ref={scrollRef}
           onScroll={updateScrollState}
-          className="flex gap-2 sm:gap-2.5 overflow-x-auto pb-1"
+          className="flex gap-3 overflow-x-auto pb-1"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {items.map((item) => (
-            <div key={item.id} className="flex-shrink-0 w-44 sm:w-52 md:w-56">
+            <div key={item.id} className="flex-shrink-0 w-[175px] sm:w-[210px] md:w-[235px] lg:w-[255px]">
               <ContentCard content={item as never} />
             </div>
           ))}
         </div>
       </div>
+
     </section>
   );
 }
