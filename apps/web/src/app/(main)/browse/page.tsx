@@ -87,7 +87,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
 
     const items = tag
       ? await getByTag(tag, 48)
-      : await getContentList({ type, limit: 48 });
+      : await getContentList({ type: type ?? undefined, limit: 48 });
 
     return (
       <div className="min-h-screen bg-kairo-dark pt-24 px-8 pb-16 max-w-[1800px] mx-auto">
