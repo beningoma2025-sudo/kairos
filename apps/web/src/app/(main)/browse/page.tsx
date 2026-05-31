@@ -11,6 +11,26 @@ import { LiveBanner } from "@/components/live/LiveBanner";
 import { ContentRowSkeleton } from "@/components/ui/Skeletons";
 import { getContentList, getByTag, getContentListWithTotal, getByTagWithTotal, getDynamicRows } from "@/lib/data/content";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import VideoGrid from "@/components/VideoGrid";
+import type { Section, Video } from "@/types/video";
+import type { ContentItem } from "@/lib/data/content";
+
+function toVideo(item: ContentItem): Video {
+  return {
+    id: item.id,
+    title: item.title,
+    poster: item.thumbnailUrl,
+    videoUrl: `/watch/${item.id}`,
+    year: item.releaseYear ?? undefined,
+    duration: item.duration
+      ? item.duration >= 3600
+        ? `${Math.floor(item.duration / 3600)}h ${Math.floor((item.duration % 3600) / 60)}m`
+        : `${Math.floor(item.duration / 60)}m`
+      : undefined,
+    rating: item.ageRating ?? undefined,
+    genre: item.type,
+  };
+}
 
 function Pagination({ page, totalPages, baseUrl }: { page: number; totalPages: number; baseUrl: string }) {
   const pages: (number | "…")[] = [];
@@ -233,23 +253,19 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
             </Suspense>
           )}
 
-          {/* Content rows */}
-          {newReleases.length > 0 && <ContentRowClient title="Nouveautés" items={newReleases} />}
-          {movies.length > 0 && <ContentRowClient title="Films" items={movies} linkHref="/browse?type=movie" linkLabel="Voir tout" />}
-          {teachings.length > 0 && <ContentRowClient title="Enseignements" items={teachings} linkHref="/browse?type=teaching" linkLabel="Voir tout" />}
-          {series.length > 0 && <ContentRowClient title="Séries" items={series} linkHref="/browse?type=series" linkLabel="Voir tout" />}
-          {kidsContent.length > 0 && <ContentRowClient title="Enfants" items={kidsContent} linkHref="/kids" linkLabel="Voir tout" />}
-
-          {/* Dynamic rows from imported categories */}
-          {dynamicRows.map((row) => (
-            <ContentRowClient
-              key={row.title}
-              title={`${row.emoji} ${row.title}`}
-              items={row.items}
-              linkHref={`/browse?tag=${encodeURIComponent(row.tag)}`}
-              linkLabel="Voir tout"
-            />
-          ))}
+          {/* VideoGrid — Tubi style white sections */}
+          <VideoGrid sections={[
+            ...(newReleases.length > 0 ? [{ title: "Nouveautés", videos: newReleases.map(toVideo) }] : []),
+            ...(movies.length > 0 ? [{ title: "Films", href: "/browse?type=movie", videos: movies.map(toVideo) }] : []),
+            ...(teachings.length > 0 ? [{ title: "Enseignements", href: "/browse?type=teaching", videos: teachings.map(toVideo) }] : []),
+            ...(series.length > 0 ? [{ title: "Séries", href: "/browse?type=series", videos: series.map(toVideo) }] : []),
+            ...(kidsContent.length > 0 ? [{ title: "Enfants", href: "/kids", videos: kidsContent.map(toVideo) }] : []),
+            ...dynamicRows.map((row) => ({
+              title: `${row.emoji} ${row.title}`,
+              href: `/browse?tag=${encodeURIComponent(row.tag)}`,
+              videos: row.items.map(toVideo),
+            })),
+          ] satisfies Section[]} />
         </div>
       </div>
     </div>
