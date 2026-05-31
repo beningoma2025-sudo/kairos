@@ -1,8 +1,3 @@
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
 // On Vercel, VERCEL_URL is set automatically.
 const API_URL =
   process.env.API_URL ??
@@ -12,9 +7,6 @@ const API_URL =
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Tell Next.js the monorepo root so it includes root-level node_modules in output tracing
-  outputFileTracingRoot: path.join(__dirname, "../../"),
-
   transpilePackages: ["@kairo/ui", "@kairo/types", "@kairo/database"],
 
   env: {
@@ -44,13 +36,6 @@ const nextConfig = {
         ],
       },
     ];
-  },
-
-  // Explicitly include Prisma query engine binary in serverless output
-  outputFileTracingIncludes: {
-    "**/*": [
-      "../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/.prisma/client/libquery_engine-rhel-openssl-3.0.x.so.node",
-    ],
   },
 
   experimental: {
