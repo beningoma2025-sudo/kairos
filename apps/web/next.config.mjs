@@ -1,5 +1,9 @@
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 // On Vercel, VERCEL_URL is set automatically.
-// Locally, API_URL defaults to localhost:3000 (Next.js dev) or 4000 (Fastify).
 const API_URL =
   process.env.API_URL ??
   (process.env.VERCEL_URL
@@ -8,6 +12,9 @@ const API_URL =
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Tell Next.js the monorepo root so it includes root-level node_modules in output tracing
+  outputFileTracingRoot: path.join(__dirname, "../../"),
+
   transpilePackages: ["@kairo/ui", "@kairo/types", "@kairo/database"],
 
   env: {
@@ -20,6 +27,8 @@ const nextConfig = {
       { protocol: "https", hostname: "**.cloudfront.net" },
       { protocol: "https", hostname: "img.clerk.com" },
       { protocol: "https", hostname: "s3.amazonaws.com" },
+      { protocol: "https", hostname: "archive.org" },
+      { protocol: "https", hostname: "img.youtube.com" },
     ],
   },
 
@@ -31,10 +40,7 @@ const nextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          {
-            key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=()",
-          },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
         ],
       },
     ];
@@ -43,14 +49,6 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react"],
     serverComponentsExternalPackages: ["@prisma/client", ".prisma/client"],
-  },
-
-  // Prisma engine binary must be included in the output
-  outputFileTracingIncludes: {
-    "**": [
-      "./node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/.prisma/client/**",
-      "../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/.prisma/client/**",
-    ],
   },
 };
 
