@@ -45,6 +45,8 @@ export default function ImportPage() {
   const [importAllProgress, setImportAllProgress] = useState<string | null>(null);
   const [result, setResult] = useState<{ imported: number; skipped: number } | null>(null);
   const [maxItems, setMaxItems] = useState(1000);
+  const [retagging, setRetagging] = useState(false);
+  const [retagResult, setRetagResult] = useState<{ untagged: number; updated: number } | null>(null);
 
   const isKids = category === "kids_faith";
   const catLabel = CATEGORIES.find((c) => c.key === category)?.label ?? category;
@@ -105,6 +107,18 @@ export default function ImportPage() {
     }
   }
 
+  async function handleRetag() {
+    setRetagging(true);
+    setRetagResult(null);
+    try {
+      const res = await fetch("/api/admin/import/retag", { method: "POST" });
+      const data = await res.json();
+      setRetagResult(data);
+    } finally {
+      setRetagging(false);
+    }
+  }
+
   async function handleImportAll() {
     setImporting(true);
     setImportAllProgress(`Démarrage de l'import de ${catLabel}…`);
@@ -153,6 +167,26 @@ export default function ImportPage() {
             </div>
           </button>
         ))}
+      </div>
+
+      {/* Retag existing content */}
+      <div className="bg-kairo-dark-card border border-white/5 rounded-2xl p-4 mb-4 flex items-center justify-between gap-4">
+        <div>
+          <p className="text-sm font-medium text-white">Re-tagger le contenu existant</p>
+          <p className="text-xs text-white/40 mt-0.5">
+            Analyse les titres/descriptions et ajoute les tags de catégorie au contenu importé sans tags.
+          </p>
+          {retagResult && (
+            <p className="text-xs text-green-400 mt-1">
+              ✓ {retagResult.updated}/{retagResult.untagged} contenus re-tagués
+            </p>
+          )}
+        </div>
+        <button onClick={handleRetag} disabled={retagging}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 text-white/60 hover:text-white text-sm transition-colors disabled:opacity-50 shrink-0">
+          {retagging ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
+          Re-tagger
+        </button>
       </div>
 
       {/* Import All Panel */}
