@@ -10,21 +10,37 @@ import { cn } from "@/lib/utils";
 import { GamificationPanel } from "@/components/gamification/GamificationPanel";
 import { NotificationsPanel } from "@/components/notifications/NotificationsPanel";
 
-interface Genre {
-  key: string; label: string; emoji: string; href: string; count: number; isType: boolean;
-}
-
-// Main nav items — always visible
+// Static main nav — always present
 const MAIN_LINKS = [
-  { label: "Home",   href: "/browse" },
-  { label: "Movies", href: "/browse?type=movie" },
-  { label: "Series", href: "/browse?type=series" },
-  { label: "Kids",   href: "/kids" },
-  { label: "Live",   href: "/live" },
-  { label: "Church", href: "/browse?type=teaching" },
+  { label: "Home",          href: "/browse",               exact: true },
+  { label: "Movies",        href: "/browse?type=movie",    exact: false },
+  { label: "Series",        href: "/browse?type=series",   exact: false },
+  { label: "Documentaries", href: "/browse?type=documentary", exact: false },
+  { label: "Kids",          href: "/kids",                 exact: true },
+  { label: "Live",          href: "/live",                 exact: true },
 ] as const;
 
-function CategoriesDropdown({ genres }: { genres: Genre[] }) {
+// Static genre categories — always show in dropdown regardless of API
+const STATIC_GENRES = [
+  { label: "Teachings & Sermons", emoji: "📖", href: "/browse?type=teaching" },
+  { label: "Films Bibliques",     emoji: "✝️", href: "/browse?tag=biblical" },
+  { label: "Films Chrétiens",     emoji: "🙏", href: "/browse?tag=christian" },
+  { label: "Billy Graham",        emoji: "🎤", href: "/browse?tag=billy-graham" },
+  { label: "Sermons",             emoji: "📣", href: "/browse?tag=sermon" },
+  { label: "Musique Gospel",      emoji: "🎵", href: "/browse?tag=gospel-music" },
+  { label: "Worship",             emoji: "🎶", href: "/browse?tag=worship" },
+  { label: "Missionnaires",       emoji: "🌍", href: "/browse?tag=missionary" },
+  { label: "Histoires Bibliques", emoji: "📚", href: "/browse?tag=bible-stories" },
+  { label: "Documentaires",       emoji: "🎞️", href: "/browse?type=documentary" },
+  { label: "Shorts",              emoji: "⚡", href: "/browse?type=short" },
+  { label: "Évangélisation",      emoji: "🌟", href: "/browse?tag=evangelism" },
+] as const;
+
+interface DynamicGenre {
+  key: string; label: string; emoji: string; href: string; count: number;
+}
+
+function CategoriesDropdown({ dynamic }: { dynamic: DynamicGenre[] }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -37,11 +53,8 @@ function CategoriesDropdown({ genres }: { genres: Genre[] }) {
     return () => document.removeEventListener("mousedown", onClick);
   }, [open]);
 
-  if (genres.length === 0) return null;
-
-  // Separate types vs tags
-  const types = genres.filter((g) => g.isType);
-  const tags = genres.filter((g) => !g.isType);
+  // Merge static + dynamic (dynamic adds counts to known genres, adds new ones)
+  const countMap = Object.fromEntries(dynamic.map((d) => [d.href, d.count]));
 
   return (
     <div className="relative" ref={ref}>
@@ -53,48 +66,38 @@ function CategoriesDropdown({ genres }: { genres: Genre[] }) {
         )}
       >
         Catégories
-        <ChevronDown size={13} className={cn("transition-transform", open && "rotate-180")} />
+        <ChevronDown size={13} className={cn("transition-transform duration-200", open && "rotate-180")} />
       </button>
 
       {open && (
-        <div className="absolute top-full left-0 mt-2 w-[520px] bg-kairo-dark-card/95 backdrop-blur-xl border border-kairo-dark-border rounded-2xl shadow-2xl p-5 z-50">
-          {/* Content types */}
-          {types.length > 0 && (
-            <div className="mb-4">
-              <p className="text-[10px] text-white/30 font-semibold uppercase tracking-widest mb-2.5">Type de contenu</p>
-              <div className="grid grid-cols-3 gap-1.5">
-                {types.map((g) => (
-                  <Link key={g.key} href={g.href} onClick={() => setOpen(false)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-kairo-dark-muted transition-colors group">
-                    <span className="text-base">{g.emoji}</span>
-                    <div>
-                      <p className="text-xs font-medium text-white/80 group-hover:text-white">{g.label}</p>
-                      <p className="text-[10px] text-white/25">{g.count} titres</p>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
+        <div className="absolute top-full left-0 mt-2 w-[560px] bg-[#0f0f1a]/98 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-5 z-50">
+          <div className="grid grid-cols-3 gap-1">
+            {STATIC_GENRES.map((g) => {
+              const count = countMap[g.href];
+              return (
+                <Link key={g.href} href={g.href} onClick={() => setOpen(false)}
+                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors group">
+                  <span className="text-xl shrink-0">{g.emoji}</span>
+                  <div className="min-w-0">
+                    <p className="text-xs font-medium text-white/80 group-hover:text-white truncate">{g.label}</p>
+                    {count && count > 0 ? (
+                      <p className="text-[10px] text-kairo-gold/70">{count} titres</p>
+                    ) : (
+                      <p className="text-[10px] text-white/20">Importer</p>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
 
-          {/* Tag genres */}
-          {tags.length > 0 && (
-            <div>
-              <p className="text-[10px] text-white/30 font-semibold uppercase tracking-widest mb-2.5">Genres</p>
-              <div className="grid grid-cols-3 gap-1.5">
-                {tags.map((g) => (
-                  <Link key={g.key} href={g.href} onClick={() => setOpen(false)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-kairo-dark-muted transition-colors group">
-                    <span className="text-base">{g.emoji}</span>
-                    <div>
-                      <p className="text-xs font-medium text-white/80 group-hover:text-white">{g.label}</p>
-                      <p className="text-[10px] text-white/25">{g.count} titres</p>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
+          <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
+            <p className="text-[11px] text-white/30">Importe du contenu depuis</p>
+            <Link href="/admin/import" onClick={() => setOpen(false)}
+              className="text-[11px] text-kairo-gold hover:text-kairo-gold-light font-medium transition-colors">
+              Admin → Import Archive →
+            </Link>
+          </div>
         </div>
       )}
     </div>
@@ -107,7 +110,7 @@ export function Navbar() {
   const { user } = useUser();
   const [streak, setStreak] = useState<number | null>(null);
   const [showPanel, setShowPanel] = useState(false);
-  const [genres, setGenres] = useState<Genre[]>([]);
+  const [dynamic, setDynamic] = useState<DynamicGenre[]>([]);
   const streakBtnRef = useRef<HTMLButtonElement>(null);
 
   const role = user?.publicMetadata?.role as string | undefined;
@@ -123,18 +126,20 @@ export function Navbar() {
 
     fetch("/api/genres")
       .then((r) => r.ok ? r.json() : null)
-      .then((data: { types: Genre[]; tags: Genre[] } | null) => {
-        if (data) setGenres([...data.types, ...data.tags]);
+      .then((data: { types: DynamicGenre[]; tags: DynamicGenre[] } | null) => {
+        if (data) setDynamic([...data.types, ...data.tags]);
       })
       .catch(() => {});
   }, [pathname]);
 
-  function isActive(href: string) {
-    if (href === "/browse" && !searchParams.get("type") && !searchParams.get("tag") && pathname === "/browse") return true;
+  function isActive(href: string, exact: boolean) {
+    if (exact) {
+      if (href === "/browse") return pathname === "/browse" && !searchParams.get("type") && !searchParams.get("tag");
+      return pathname === href;
+    }
     if (href.includes("?type=")) return searchParams.get("type") === href.split("type=")[1];
-    if (href === "/kids") return pathname === "/kids";
-    if (href === "/live") return pathname === "/live";
-    return false;
+    if (href.includes("?tag=")) return searchParams.get("tag") === href.split("tag=")[1];
+    return pathname.startsWith(href.split("?")[0]);
   }
 
   return (
@@ -149,45 +154,34 @@ export function Navbar() {
         </Link>
 
         {/* Nav Links */}
-        <ul className="hidden md:flex items-center gap-0.5">
+        <ul className="hidden lg:flex items-center gap-0.5">
           {MAIN_LINKS.map((link) => (
             <li key={link.label}>
               <Link href={link.href}
                 className={cn(
                   "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
-                  isActive(link.href) ? "text-white" : "text-white/60 hover:text-white"
+                  isActive(link.href, link.exact) ? "text-white" : "text-white/60 hover:text-white"
                 )}>
                 {link.label}
               </Link>
             </li>
           ))}
-
-          {/* Categories dropdown */}
           <li>
-            <CategoriesDropdown genres={genres} />
+            <CategoriesDropdown dynamic={dynamic} />
           </li>
         </ul>
 
         {/* Right Actions */}
         <div className="flex items-center gap-3 ml-auto">
-          <Link href="/search"
-            className="p-2 rounded-full text-white/70 hover:text-white transition-colors"
-            aria-label="Search">
+          <Link href="/search" className="p-2 rounded-full text-white/70 hover:text-white transition-colors">
             <Search size={18} />
           </Link>
-
           <Link href="/watchlist"
-            className={cn(
-              "p-2 rounded-full transition-colors",
-              pathname === "/watchlist" ? "text-kairo-gold" : "text-white/70 hover:text-white"
-            )}
-            aria-label="My Watchlist">
+            className={cn("p-2 rounded-full transition-colors", pathname === "/watchlist" ? "text-kairo-gold" : "text-white/70 hover:text-white")}>
             <Bookmark size={18} />
           </Link>
-
           <NotificationsPanel />
 
-          {/* Streak */}
           <div className="relative">
             <button ref={streakBtnRef} onClick={() => setShowPanel((v) => !v)}
               className={cn(
@@ -199,9 +193,7 @@ export function Navbar() {
               <Flame size={14} className={cn(streak && streak > 0 ? "text-orange-400" : "text-white/30")} />
               <span className={cn("tabular-nums", streak === null && "opacity-0")}>{streak ?? 0}</span>
             </button>
-            {showPanel && (
-              <GamificationPanel onClose={() => setShowPanel(false)} anchorRef={streakBtnRef} />
-            )}
+            {showPanel && <GamificationPanel onClose={() => setShowPanel(false)} anchorRef={streakBtnRef} />}
           </div>
 
           {isAdmin && (

@@ -69,11 +69,11 @@ async function ContinueWatching({ userId }: { userId: string }) {
 }
 
 interface BrowsePageProps {
-  searchParams: Promise<{ type?: string; tag?: string }>;
+  searchParams: { type?: string; tag?: string };
 }
 
 export default async function BrowsePage({ searchParams }: BrowsePageProps) {
-  const { type, tag } = await searchParams;
+  const { type, tag } = searchParams;
   const { userId: clerkId } = await auth();
   const dbUser = clerkId
     ? await prisma.user.findUnique({ where: { clerkId }, select: { id: true } })
