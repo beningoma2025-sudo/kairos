@@ -46,15 +46,15 @@ const nextConfig = {
     ];
   },
 
-  experimental: {
-    optimizePackageImports: ["lucide-react"],
+  // Explicitly include Prisma query engine binary in serverless output
+  outputFileTracingIncludes: {
+    "**/*": [
+      "../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/.prisma/client/libquery_engine-rhel-openssl-3.0.x.so.node",
+    ],
   },
 
-  webpack(config, { isServer }) {
-    if (isServer) {
-      config.externals.push({ "@prisma/client": "commonjs @prisma/client" });
-    }
-    return config;
+  experimental: {
+    optimizePackageImports: ["lucide-react"],
   },
 };
 
