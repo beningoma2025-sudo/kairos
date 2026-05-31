@@ -75,8 +75,8 @@ export function GenreBar() {
           className={cn(
             "flex-shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all border",
             !activeType && !activeTag
-              ? "bg-white text-kairo-dark border-white"
-              : "bg-kairo-dark-card border-kairo-dark-border text-white/60 hover:text-white hover:border-white/30"
+              ? "bg-[#111] text-white border-[#111]"
+              : "bg-white border-[#e5e5e5] text-[#555] hover:text-[#111] hover:border-[#bbb]"
           )}>
           🏠 Tout
         </Link>
@@ -91,8 +91,8 @@ export function GenreBar() {
               className={cn(
                 "flex-shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all border whitespace-nowrap",
                 isActive
-                  ? "bg-kairo-gold text-kairo-dark border-kairo-gold"
-                  : "bg-kairo-dark-card border-kairo-dark-border text-white/60 hover:text-white hover:border-white/30"
+                  ? "bg-[#111] text-white border-[#111]"
+                  : "bg-white border-[#e5e5e5] text-[#555] hover:text-[#111] hover:border-[#bbb]"
               )}>
               <span>{g.emoji}</span>
               {g.label}

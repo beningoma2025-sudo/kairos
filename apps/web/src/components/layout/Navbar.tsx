@@ -143,14 +143,12 @@ export function Navbar() {
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 h-16">
-      <div className="absolute inset-0 bg-gradient-to-b from-kairo-dark/95 to-transparent pointer-events-none" />
-
-      <nav className="relative flex items-center justify-between px-8 h-full max-w-[1800px] mx-auto">
+    <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-white border-b border-[#e5e5e5]">
+      <nav className="flex items-center justify-between px-8 h-full max-w-[1800px] mx-auto">
         {/* Logo */}
-        <Link href="/browse" className="flex items-center gap-1.5 mr-8 shrink-0">
-          <span className="text-xl font-display font-bold text-white tracking-tight">KAIRO</span>
-          <span className="text-kairo-gold text-xs">✦</span>
+        <Link href="/browse" className="flex items-center gap-1 mr-8 shrink-0">
+          <span className="text-xl font-bold text-[#fa3c4c] tracking-tight" style={{ fontFamily: "sans-serif" }}>KAIRO</span>
+          <span className="text-[#fa3c4c] text-xs">+</span>
         </Link>
 
         {/* Nav Links */}
@@ -160,7 +158,7 @@ export function Navbar() {
               <Link href={link.href}
                 className={cn(
                   "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
-                  isActive(link.href, link.exact) ? "text-white" : "text-white/60 hover:text-white"
+                  isActive(link.href, link.exact) ? "text-[#111]" : "text-[#555] hover:text-[#111]"
                 )}>
                 {link.label}
               </Link>
@@ -173,11 +171,11 @@ export function Navbar() {
 
         {/* Right Actions */}
         <div className="flex items-center gap-3 ml-auto">
-          <Link href="/search" className="p-2 rounded-full text-white/70 hover:text-white transition-colors">
+          <Link href="/search" className="p-2 rounded-full text-[#555] hover:text-[#111] transition-colors">
             <Search size={18} />
           </Link>
           <Link href="/watchlist"
-            className={cn("p-2 rounded-full transition-colors", pathname === "/watchlist" ? "text-kairo-gold" : "text-white/70 hover:text-white")}>
+            className={cn("p-2 rounded-full transition-colors", pathname === "/watchlist" ? "text-[#fa3c4c]" : "text-[#555] hover:text-[#111]")}>
             <Bookmark size={18} />
           </Link>
           <NotificationsPanel />

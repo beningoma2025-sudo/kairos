@@ -4,7 +4,7 @@ import { SpiritualAssistant } from "@/components/ai/SpiritualAssistant";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-kairo-dark">
+    <div className="min-h-screen bg-white">
       <Suspense fallback={<div className="h-16 bg-kairo-dark" />}>
         <Navbar />
       </Suspense>

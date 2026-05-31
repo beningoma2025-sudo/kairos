@@ -51,39 +51,31 @@ function Pagination({ page, totalPages, baseUrl }: { page: number; totalPages: n
     <nav aria-label="Pagination" className="flex items-center justify-center gap-1.5 mt-14">
       {/* Précédent */}
       {page > 1 ? (
-        <a href={href(page - 1)} className="flex items-center gap-1 px-3 py-2 rounded-md bg-kairo-dark-card border border-kairo-dark-border text-white/70 text-sm hover:border-kairo-gold hover:text-white transition-all">
+        <a href={href(page - 1)} className="flex items-center gap-1 px-3 py-2 rounded-md bg-white border border-[#e5e5e5] text-[#555] text-sm hover:border-[#111] hover:text-[#111] transition-all">
           <ChevronLeft size={14} /> Préc.
         </a>
       ) : (
-        <span className="flex items-center gap-1 px-3 py-2 rounded-md text-white/20 text-sm cursor-not-allowed select-none">
+        <span className="flex items-center gap-1 px-3 py-2 rounded-md text-[#ccc] text-sm cursor-not-allowed select-none">
           <ChevronLeft size={14} /> Préc.
         </span>
       )}
 
-      {/* Page numbers */}
       {pages.map((p, i) =>
         p === "…" ? (
-          <span key={`ellipsis-${i}`} className="w-9 h-9 flex items-center justify-center text-white/30 text-sm select-none">
-            …
-          </span>
+          <span key={`ellipsis-${i}`} className="w-9 h-9 flex items-center justify-center text-[#bbb] text-sm select-none">…</span>
         ) : p === page ? (
-          <span key={p} className="w-9 h-9 flex items-center justify-center rounded-md bg-kairo-gold text-kairo-dark font-bold text-sm">
-            {p}
-          </span>
+          <span key={p} className="w-9 h-9 flex items-center justify-center rounded-md bg-[#111] text-white font-bold text-sm">{p}</span>
         ) : (
-          <a key={p} href={href(p)} className="w-9 h-9 flex items-center justify-center rounded-md bg-kairo-dark-card border border-kairo-dark-border text-white/60 text-sm hover:border-kairo-gold hover:text-white transition-all">
-            {p}
-          </a>
+          <a key={p} href={href(p)} className="w-9 h-9 flex items-center justify-center rounded-md bg-white border border-[#e5e5e5] text-[#555] text-sm hover:border-[#111] hover:text-[#111] transition-all">{p}</a>
         )
       )}
 
-      {/* Suivant */}
       {page < totalPages ? (
-        <a href={href(page + 1)} className="flex items-center gap-1 px-3 py-2 rounded-md bg-kairo-dark-card border border-kairo-dark-border text-white/70 text-sm hover:border-kairo-gold hover:text-white transition-all">
+        <a href={href(page + 1)} className="flex items-center gap-1 px-3 py-2 rounded-md bg-white border border-[#e5e5e5] text-[#555] text-sm hover:border-[#111] hover:text-[#111] transition-all">
           Suiv. <ChevronRight size={14} />
         </a>
       ) : (
-        <span className="flex items-center gap-1 px-3 py-2 rounded-md text-white/20 text-sm cursor-not-allowed select-none">
+        <span className="flex items-center gap-1 px-3 py-2 rounded-md text-[#ccc] text-sm cursor-not-allowed select-none">
           Suiv. <ChevronRight size={14} />
         </span>
       )}
@@ -176,7 +168,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
     const baseUrl = tag ? `/browse?tag=${tag}` : `/browse?type=${type}`;
 
     return (
-      <div className="min-h-screen bg-kairo-dark pt-24 px-8 pb-16 max-w-[1800px] mx-auto">
+      <div className="min-h-screen bg-white pt-24 px-8 pb-16 max-w-[1800px] mx-auto">
         <div className="mb-6">
           <Suspense fallback={null}>
             <GenreBar />
@@ -184,18 +176,18 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
         </div>
 
         <div className="flex items-baseline gap-4 mb-6">
-          <h1 className="text-2xl font-display font-bold text-white">{title}</h1>
-          <span className="text-white/40 text-sm">{total} vidéos</span>
+          <h1 className="text-2xl font-bold text-[#111]">{title}</h1>
+          <span className="text-[#999] text-sm">{total} vidéos</span>
         </div>
 
         {items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-32 text-white/25">
+          <div className="flex flex-col items-center justify-center py-32 text-[#bbb]">
             <p className="text-lg mb-2">Aucun contenu dans cette catégorie</p>
             <p className="text-sm">Utilise Admin → Import Archive pour ajouter du contenu</p>
           </div>
         ) : (
           <>
-            <ContentRowClient title="" items={items} grid />
+            <VideoGrid sections={[{ title: "", videos: items.map(toVideo) }]} />
 
             {totalPages > 1 && (
               <Pagination page={page} totalPages={totalPages} baseUrl={baseUrl} />
@@ -218,7 +210,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   ]);
 
   return (
-    <div className="min-h-screen bg-kairo-dark">
+    <div className="min-h-screen bg-white">
 
       <div className="pt-24 pb-8 space-y-8">
 
@@ -226,8 +218,8 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
         <Suspense fallback={
           <div className="px-4 sm:px-8 max-w-[1800px] mx-auto">
             <div className="flex gap-3">
-              <div className="flex-shrink-0 w-[calc(50%-6px)] rounded-xl bg-kairo-dark-card animate-pulse" style={{ height: "clamp(220px, 42vw, 520px)" }} />
-              <div className="flex-shrink-0 w-[calc(50%-6px)] rounded-xl bg-kairo-dark-card animate-pulse" style={{ height: "clamp(220px, 42vw, 520px)" }} />
+              <div className="flex-shrink-0 w-[calc(50%-6px)] rounded-xl bg-gray-100 animate-pulse" style={{ height: "clamp(220px, 42vw, 520px)" }} />
+              <div className="flex-shrink-0 w-[calc(50%-6px)] rounded-xl bg-gray-100 animate-pulse" style={{ height: "clamp(220px, 42vw, 520px)" }} />
             </div>
           </div>
         }>
