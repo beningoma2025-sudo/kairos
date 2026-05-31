@@ -76,7 +76,8 @@
       "Bash(git -C \"c:\\\\Users\\\\DELL\\\\kairo\" add apps/web/src/components/content/FeaturedHero.tsx apps/web/src/components/content/FeaturedHeroClient.tsx)",
       "Bash(git -C \"c:\\\\Users\\\\DELL\\\\kairo\" add apps/web/src/components/content/FeaturedHero.tsx apps/web/src/app/\\\\\\(main\\\\\\)/layout.tsx)",
       "Bash(git -C \"c:\\\\Users\\\\DELL\\\\kairo\" add apps/web/src/types/video.ts apps/web/src/components/VideoCard.tsx apps/web/src/components/SectionRow.tsx apps/web/src/components/VideoGrid.tsx apps/web/src/app/\\\\\\(main\\\\\\)/browse/page.tsx)",
-      "Bash(git -C \"c:\\\\Users\\\\DELL\\\\kairo\" add -A)"
+      "Bash(git -C \"c:\\\\Users\\\\DELL\\\\kairo\" add -A)",
+      "Bash(git -C \"c:\\\\Users\\\\DELL\\\\kairo\" add apps/web/src/components/SectionRow.tsx apps/web/src/components/layout/Navbar.tsx)"
     ]
   }
 }
