@@ -84,7 +84,7 @@ export default function ImportPage() {
       const res = await fetch("/api/admin/import/archive/bulk", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: toImport, isKids }),
+        body: JSON.stringify({ items: toImport, isKids, category }),
       });
       const result = await res.json();
       setImportResult(result);

@@ -11,14 +11,26 @@ interface ContentRowClientProps {
   items: ContentItem[];
   linkHref?: string;
   linkLabel?: string;
+  grid?: boolean; // show as grid instead of horizontal scroll
 }
 
-export function ContentRowClient({ title, items, linkHref, linkLabel }: ContentRowClientProps) {
+export function ContentRowClient({ title, items, linkHref, linkLabel, grid }: ContentRowClientProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
   if (items.length === 0) return null;
+
+  // Grid mode — full-page category view
+  if (grid) {
+    return (
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+        {items.map((item) => (
+          <ContentCard key={item.id} content={item as never} />
+        ))}
+      </div>
+    );
+  }
 
   const updateScrollState = () => {
     const el = scrollRef.current;
