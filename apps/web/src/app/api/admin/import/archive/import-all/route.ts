@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { prisma } from "@kairo/database";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin-auth";
+import { searchTMDB } from "@/lib/tmdb";
 
 const CATEGORY_MAP: Record<string, { type: string; tags: string[] }> = {
   biblical_films:  { type: "MOVIE",       tags: ["biblical", "bible", "films-bibliques"] },
@@ -114,17 +115,24 @@ export async function POST(req: Request) {
           ? doc.description[0]
           : (doc.description ?? doc.title ?? doc.identifier);
 
+        const cleanTitle = (doc.title ?? doc.identifier).slice(0, 255);
+        const archiveYear = doc.year ? parseInt(String(doc.year), 10) || null : null;
+
+        // Try TMDB for real poster + backdrop
+        const tmdb = await searchTMDB(cleanTitle, archiveYear);
+
         await prisma.content.create({
           data: {
-            title: (doc.title ?? doc.identifier).slice(0, 255),
-            description: (description ?? "").slice(0, 2000),
+            title: cleanTitle,
+            description: (tmdb?.overview ?? description ?? "").slice(0, 2000),
             type: catConfig.type as never,
             sourceType: "EMBED",
             providerContentId: doc.identifier,
             embedUrl: `https://archive.org/embed/${doc.identifier}`,
             sourceUrl: `https://archive.org/details/${doc.identifier}`,
-            thumbnailUrl: `https://archive.org/services/img/${doc.identifier}`,
-            releaseYear: doc.year ? parseInt(String(doc.year), 10) || null : null,
+            thumbnailUrl: tmdb?.posterUrl ?? `https://archive.org/services/img/${doc.identifier}`,
+            backdropUrl:  tmdb?.backdropUrl ?? null,
+            releaseYear:  tmdb?.releaseYear ?? archiveYear,
             isKids: catConfig.type === "KIDS",
             tags: catConfig.tags,
             status: "PUBLISHED",

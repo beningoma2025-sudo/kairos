@@ -26,7 +26,8 @@
         "CLERK_WEBHOOK_SECRET",
         "SENTRY_DSN",
         "NEXT_PUBLIC_SENTRY_DSN",
-        "RESEND_API_KEY"
+        "RESEND_API_KEY",
+        "TMDB_API_KEY"
       ]
     },
     "dev": {

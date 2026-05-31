@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Download, CheckCircle, Loader2, ChevronLeft, ChevronRight, Film, RefreshCw, Zap, AlertCircle } from "lucide-react";
+import { Download, CheckCircle, Loader2, ChevronLeft, ChevronRight, Film, RefreshCw, Zap, AlertCircle, ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const CATEGORIES = [
@@ -47,6 +47,9 @@ export default function ImportPage() {
   const [maxItems, setMaxItems] = useState(1000);
   const [retagging, setRetagging] = useState(false);
   const [retagResult, setRetagResult] = useState<{ untagged: number; updated: number } | null>(null);
+  const [repostering, setRepostering] = useState(false);
+  const [reposterResult, setReposterResult] = useState<{ total: number; updated: number; notFound: number } | null>(null);
+  const [reposterLimit, setReposterLimit] = useState(100);
 
   const isKids = category === "kids_faith";
   const catLabel = CATEGORIES.find((c) => c.key === category)?.label ?? category;
@@ -104,6 +107,22 @@ export default function ImportPage() {
       void load(category, page);
     } finally {
       setImporting(false);
+    }
+  }
+
+  async function handleReposter() {
+    setRepostering(true);
+    setReposterResult(null);
+    try {
+      const res = await fetch("/api/admin/reposter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ limit: reposterLimit }),
+      });
+      const data = await res.json();
+      setReposterResult(data);
+    } finally {
+      setRepostering(false);
     }
   }
 
@@ -167,6 +186,43 @@ export default function ImportPage() {
             </div>
           </button>
         ))}
+      </div>
+
+      {/* TMDB Re-poster */}
+      <div className="bg-kairo-dark-card border border-blue-500/20 rounded-2xl p-4 mb-4 flex items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-0.5">
+            <ImageIcon size={14} className="text-blue-400" />
+            <p className="text-sm font-medium text-white">Affiches TMDB</p>
+          </div>
+          <p className="text-xs text-white/40">
+            Remplace les thumbnails Archive.org par de vraies affiches via TMDB.
+            Nécessite <code className="text-blue-400">TMDB_API_KEY</code> dans les variables d'environnement.
+          </p>
+          {reposterResult && (
+            <p className="text-xs text-blue-400 mt-1">
+              ✓ {reposterResult.updated}/{reposterResult.total} affiches mises à jour
+              {reposterResult.notFound > 0 && ` · ${reposterResult.notFound} non trouvées`}
+            </p>
+          )}
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <select
+            value={reposterLimit}
+            onChange={(e) => setReposterLimit(Number(e.target.value))}
+            className="bg-kairo-dark-card border border-kairo-dark-border rounded-lg px-2 py-1.5 text-sm text-white focus:outline-none"
+          >
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+            <option value={200}>200</option>
+            <option value={500}>500</option>
+          </select>
+          <button onClick={handleReposter} disabled={repostering}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-blue-500/30 text-blue-400 hover:text-blue-300 text-sm transition-colors disabled:opacity-50">
+            {repostering ? <Loader2 size={14} className="animate-spin" /> : <ImageIcon size={14} />}
+            Mettre à jour
+          </button>
+        </div>
       </div>
 
       {/* Retag existing content */}
