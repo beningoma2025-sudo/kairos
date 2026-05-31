@@ -2,7 +2,9 @@ import type { Content } from "@kairo/types";
 
 // On Vercel: next.config.ts resolves API_URL from VERCEL_URL automatically.
 // Locally with Fastify dev: set API_URL=http://localhost:4000 in .env.local
-const API_URL = process.env.API_URL ?? "http://localhost:3000";
+const API_URL = process.env.VERCEL_URL
+  ? `https://${process.env.VERCEL_URL}`
+  : (process.env.API_URL ?? "http://localhost:3000");
 
 export async function getContentById(id: string): Promise<Content | null> {
   try {

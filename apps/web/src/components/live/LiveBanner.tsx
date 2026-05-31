@@ -3,7 +3,7 @@ import { Radio } from "lucide-react";
 import type { LiveEvent } from "@kairo/types";
 
 async function fetchLiveNow(): Promise<LiveEvent[]> {
-  const API_URL = process.env.API_URL ?? "http://localhost:4000";
+  const API_URL = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : (process.env.API_URL ?? "http://localhost:3000");
   try {
     const res = await fetch(`${API_URL}/api/live`, { next: { revalidate: 30 } });
     if (!res.ok) return [];

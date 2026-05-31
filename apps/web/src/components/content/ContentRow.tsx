@@ -53,7 +53,9 @@ async function ContentRowInner({
   linkHref,
   linkLabel,
 }: ContentRowProps) {
-  const API_URL = process.env.API_URL ?? "http://localhost:4000";
+  const API_URL = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : (process.env.API_URL ?? "http://localhost:3000");
   let items: Content[] = [];
 
   try {

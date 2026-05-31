@@ -35,7 +35,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
 };
 
 async function getStats(userId: string) {
-  const API_URL = process.env.API_URL ?? "http://localhost:3000";
+  const API_URL = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : (process.env.API_URL ?? "http://localhost:3000");
   try {
     const res = await fetch(`${API_URL}/api/gamification/stats`, {
       headers: { Cookie: "" }, // Server-side: pass through

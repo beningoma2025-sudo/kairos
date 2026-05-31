@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 async function fetchLiveData(): Promise<{ liveNow: LiveEvent[]; upcoming: LiveEvent[] }> {
-  const API_URL = process.env.API_URL ?? "http://localhost:4000";
+  const API_URL = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : (process.env.API_URL ?? "http://localhost:3000");
   try {
     const res = await fetch(`${API_URL}/api/live`, { next: { revalidate: 30 } });
     if (!res.ok) return { liveNow: [], upcoming: [] };
