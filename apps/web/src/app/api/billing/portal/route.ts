@@ -4,9 +4,8 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@kairo/database";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
 export async function GET(req: Request) {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
   const { userId: clerkId } = await auth();
   if (!clerkId) return Response.redirect(new URL("/sign-in", req.url));
 
