@@ -199,48 +199,58 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
 
   return (
     <div className="min-h-screen bg-kairo-dark">
-      {/* Hero */}
-      <Suspense fallback={<div className="h-[70vh] bg-kairo-dark-card animate-pulse" />}>
-        <FeaturedHero />
-      </Suspense>
 
-      <div className="px-8 py-6 max-w-[1800px] mx-auto space-y-8">
+      <div className="pt-24 pb-8 space-y-8">
 
-        {/* Genre filter bar */}
-        <Suspense fallback={null}>
-          <GenreBar />
+        {/* ── Tubi-style featured cards hero ───────────────── */}
+        <Suspense fallback={
+          <div className="px-4 sm:px-8 max-w-[1800px] mx-auto">
+            <div className="flex gap-3">
+              <div className="flex-shrink-0 w-[calc(50%-6px)] rounded-xl bg-kairo-dark-card animate-pulse" style={{ height: "clamp(220px, 42vw, 520px)" }} />
+              <div className="flex-shrink-0 w-[calc(50%-6px)] rounded-xl bg-kairo-dark-card animate-pulse" style={{ height: "clamp(220px, 42vw, 520px)" }} />
+            </div>
+          </div>
+        }>
+          <FeaturedHero />
         </Suspense>
 
-        {/* Live banner */}
-        <Suspense fallback={null}>
-          <LiveBanner />
-        </Suspense>
+        <div className="px-4 sm:px-8 max-w-[1800px] mx-auto space-y-8">
 
-        {/* Continue Watching */}
-        {dbUser && (
-          <Suspense fallback={<ContentRowSkeleton title="Continue Watching" />}>
-            <ContinueWatching userId={dbUser.id} />
+          {/* Genre filter bar */}
+          <Suspense fallback={null}>
+            <GenreBar />
           </Suspense>
-        )}
 
-        {/* Static content type rows */}
-        {featured.length > 0 && <ContentRowClient title="⭐ Featured" items={featured} />}
-        {newReleases.length > 0 && <ContentRowClient title="🆕 New Releases" items={newReleases} />}
-        {movies.length > 0 && <ContentRowClient title="🎬 Movies" items={movies} linkHref="/browse?type=movie" linkLabel="See all" />}
-        {teachings.length > 0 && <ContentRowClient title="📖 Teachings" items={teachings} linkHref="/browse?type=teaching" linkLabel="See all" />}
-        {series.length > 0 && <ContentRowClient title="📺 Series" items={series} linkHref="/browse?type=series" linkLabel="See all" />}
-        {kidsContent.length > 0 && <ContentRowClient title="👶 Kairo Kids" items={kidsContent} linkHref="/kids" linkLabel="Go to Kids" />}
+          {/* Live banner */}
+          <Suspense fallback={null}>
+            <LiveBanner />
+          </Suspense>
 
-        {/* Dynamic rows from imported categories */}
-        {dynamicRows.map((row) => (
-          <ContentRowClient
-            key={row.title}
-            title={`${row.emoji} ${row.title}`}
-            items={row.items}
-            linkHref={`/browse?tag=${encodeURIComponent(row.tag)}`}
-            linkLabel="Voir tout"
-          />
-        ))}
+          {/* Continue Watching */}
+          {dbUser && (
+            <Suspense fallback={<ContentRowSkeleton title="Continue Watching" />}>
+              <ContinueWatching userId={dbUser.id} />
+            </Suspense>
+          )}
+
+          {/* Content rows */}
+          {newReleases.length > 0 && <ContentRowClient title="Nouveautés" items={newReleases} />}
+          {movies.length > 0 && <ContentRowClient title="Films" items={movies} linkHref="/browse?type=movie" linkLabel="Voir tout" />}
+          {teachings.length > 0 && <ContentRowClient title="Enseignements" items={teachings} linkHref="/browse?type=teaching" linkLabel="Voir tout" />}
+          {series.length > 0 && <ContentRowClient title="Séries" items={series} linkHref="/browse?type=series" linkLabel="Voir tout" />}
+          {kidsContent.length > 0 && <ContentRowClient title="Enfants" items={kidsContent} linkHref="/kids" linkLabel="Voir tout" />}
+
+          {/* Dynamic rows from imported categories */}
+          {dynamicRows.map((row) => (
+            <ContentRowClient
+              key={row.title}
+              title={`${row.emoji} ${row.title}`}
+              items={row.items}
+              linkHref={`/browse?tag=${encodeURIComponent(row.tag)}`}
+              linkLabel="Voir tout"
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
