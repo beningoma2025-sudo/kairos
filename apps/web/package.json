@@ -12,6 +12,7 @@
   "dependencies": {
     "@clerk/nextjs": "^6.7.3",
     "@kairo/database": "workspace:*",
+    "@prisma/client": "^5.22.0",
     "@kairo/types": "workspace:*",
     "@mux/mux-node": "^9.0.1",
     "@mux/mux-player-react": "^3.2.0",
