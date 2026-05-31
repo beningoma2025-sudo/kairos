@@ -52,8 +52,9 @@ export async function getContentList(params: {
   featured?: boolean;
   sort?: "newest" | "popular";
   limit?: number;
+  page?: number;
 }): Promise<ContentItem[]> {
-  const { type, kids, featured, sort = "newest", limit = 20 } = params;
+  const { type, kids, featured, sort = "newest", limit = 20, page = 1 } = params;
 
   return prisma.content.findMany({
     where: {
@@ -63,9 +64,41 @@ export async function getContentList(params: {
       ...(featured !== undefined && { isFeatured: featured }),
     },
     orderBy: sort === "popular" ? { viewCount: "desc" } : { publishedAt: "desc" },
+    skip: (page - 1) * limit,
     take: limit,
     select: SELECT,
   });
+}
+
+export async function getContentListWithTotal(params: {
+  type?: string;
+  kids?: boolean;
+  featured?: boolean;
+  sort?: "newest" | "popular";
+  limit?: number;
+  page?: number;
+}): Promise<{ items: ContentItem[]; total: number }> {
+  const { type, kids, featured, sort = "newest", limit = 48, page = 1 } = params;
+
+  const where = {
+    status: "PUBLISHED" as never,
+    ...(type && { type: type.toUpperCase() as never }),
+    ...(kids !== undefined && { isKids: kids }),
+    ...(featured !== undefined && { isFeatured: featured }),
+  };
+
+  const [items, total] = await Promise.all([
+    prisma.content.findMany({
+      where,
+      orderBy: sort === "popular" ? { viewCount: "desc" } : { publishedAt: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+      select: SELECT,
+    }),
+    prisma.content.count({ where }),
+  ]);
+
+  return { items, total };
 }
 
 export async function getByTag(tag: string, limit = 20): Promise<ContentItem[]> {
@@ -77,8 +110,27 @@ export async function getByTag(tag: string, limit = 20): Promise<ContentItem[]> 
   });
 }
 
-// Returns populated genre rows for homepage: {title, emoji, items}[]
-export async function getDynamicRows(): Promise<{ title: string; emoji: string; items: ContentItem[] }[]> {
+export async function getByTagWithTotal(
+  tag: string,
+  limit = 48,
+  page = 1,
+): Promise<{ items: ContentItem[]; total: number }> {
+  const where = { status: "PUBLISHED" as never, tags: { has: tag } };
+  const [items, total] = await Promise.all([
+    prisma.content.findMany({
+      where,
+      orderBy: { viewCount: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+      select: SELECT,
+    }),
+    prisma.content.count({ where }),
+  ]);
+  return { items, total };
+}
+
+// Returns populated genre rows for homepage: {tag, title, emoji, items}[]
+export async function getDynamicRows(): Promise<{ tag: string; title: string; emoji: string; items: ContentItem[] }[]> {
   const TAG_ROWS: { tag: string; label: string; emoji: string }[] = [
     { tag: "biblical",      label: "Films Bibliques",   emoji: "✝️" },
     { tag: "billy-graham",  label: "Billy Graham",      emoji: "🎤" },
@@ -97,7 +149,7 @@ export async function getDynamicRows(): Promise<{ title: string; emoji: string; 
         take: 20,
         select: SELECT,
       });
-      return { title: r.label, emoji: r.emoji, items };
+      return { tag: r.tag, title: r.label, emoji: r.emoji, items };
     })
   );
 

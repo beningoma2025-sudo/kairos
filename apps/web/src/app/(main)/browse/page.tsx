@@ -9,7 +9,67 @@ import { ContentRowClient } from "@/components/content/ContentRow";
 import { GenreBar } from "@/components/content/GenreBar";
 import { LiveBanner } from "@/components/live/LiveBanner";
 import { ContentRowSkeleton } from "@/components/ui/Skeletons";
-import { getContentList, getByTag, getDynamicRows } from "@/lib/data/content";
+import { getContentList, getByTag, getContentListWithTotal, getByTagWithTotal, getDynamicRows } from "@/lib/data/content";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+function Pagination({ page, totalPages, baseUrl }: { page: number; totalPages: number; baseUrl: string }) {
+  const pages: (number | "…")[] = [];
+
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) pages.push(i);
+  } else {
+    pages.push(1);
+    if (page > 3) pages.push("…");
+    for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) pages.push(i);
+    if (page < totalPages - 2) pages.push("…");
+    pages.push(totalPages);
+  }
+
+  const href = (p: number) => `${baseUrl}&page=${p}`;
+
+  return (
+    <nav aria-label="Pagination" className="flex items-center justify-center gap-1.5 mt-14">
+      {/* Précédent */}
+      {page > 1 ? (
+        <a href={href(page - 1)} className="flex items-center gap-1 px-3 py-2 rounded-md bg-kairo-dark-card border border-kairo-dark-border text-white/70 text-sm hover:border-kairo-gold hover:text-white transition-all">
+          <ChevronLeft size={14} /> Préc.
+        </a>
+      ) : (
+        <span className="flex items-center gap-1 px-3 py-2 rounded-md text-white/20 text-sm cursor-not-allowed select-none">
+          <ChevronLeft size={14} /> Préc.
+        </span>
+      )}
+
+      {/* Page numbers */}
+      {pages.map((p, i) =>
+        p === "…" ? (
+          <span key={`ellipsis-${i}`} className="w-9 h-9 flex items-center justify-center text-white/30 text-sm select-none">
+            …
+          </span>
+        ) : p === page ? (
+          <span key={p} className="w-9 h-9 flex items-center justify-center rounded-md bg-kairo-gold text-kairo-dark font-bold text-sm">
+            {p}
+          </span>
+        ) : (
+          <a key={p} href={href(p)} className="w-9 h-9 flex items-center justify-center rounded-md bg-kairo-dark-card border border-kairo-dark-border text-white/60 text-sm hover:border-kairo-gold hover:text-white transition-all">
+            {p}
+          </a>
+        )
+      )}
+
+      {/* Suivant */}
+      {page < totalPages ? (
+        <a href={href(page + 1)} className="flex items-center gap-1 px-3 py-2 rounded-md bg-kairo-dark-card border border-kairo-dark-border text-white/70 text-sm hover:border-kairo-gold hover:text-white transition-all">
+          Suiv. <ChevronRight size={14} />
+        </a>
+      ) : (
+        <span className="flex items-center gap-1 px-3 py-2 rounded-md text-white/20 text-sm cursor-not-allowed select-none">
+          Suiv. <ChevronRight size={14} />
+        </span>
+      )}
+    </nav>
+  );
+}
 
 export const metadata: Metadata = {
   title: "Browse | Kairo",
@@ -68,12 +128,15 @@ async function ContinueWatching({ userId }: { userId: string }) {
   return <ContentRowClient title="Continue Watching" items={items} />;
 }
 
+const PAGE_SIZE = 48;
+
 interface BrowsePageProps {
-  searchParams: { type?: string; tag?: string };
+  searchParams: { type?: string; tag?: string; page?: string };
 }
 
 export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   const { type, tag } = searchParams;
+  const page = Math.max(1, parseInt(searchParams.page ?? "1", 10) || 1);
   const { userId: clerkId } = await auth();
   const dbUser = clerkId
     ? await prisma.user.findUnique({ where: { clerkId }, select: { id: true } })
@@ -85,9 +148,12 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
       ? (TAG_LABELS[tag] ?? tag)
       : (TYPE_LABELS[type!] ?? type!);
 
-    const items = tag
-      ? await getByTag(tag, 48)
-      : await getContentList({ type: type ?? undefined, limit: 48 });
+    const { items, total } = tag
+      ? await getByTagWithTotal(tag, PAGE_SIZE, page)
+      : await getContentListWithTotal({ type: type ?? undefined, limit: PAGE_SIZE, page });
+
+    const totalPages = Math.ceil(total / PAGE_SIZE);
+    const baseUrl = tag ? `/browse?tag=${tag}` : `/browse?type=${type}`;
 
     return (
       <div className="min-h-screen bg-kairo-dark pt-24 px-8 pb-16 max-w-[1800px] mx-auto">
@@ -97,7 +163,10 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
           </Suspense>
         </div>
 
-        <h1 className="text-2xl font-display font-bold text-white mb-6">{title}</h1>
+        <div className="flex items-baseline gap-4 mb-6">
+          <h1 className="text-2xl font-display font-bold text-white">{title}</h1>
+          <span className="text-white/40 text-sm">{total} vidéos</span>
+        </div>
 
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-32 text-white/25">
@@ -105,7 +174,13 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
             <p className="text-sm">Utilise Admin → Import Archive pour ajouter du contenu</p>
           </div>
         ) : (
-          <ContentRowClient title="" items={items} grid />
+          <>
+            <ContentRowClient title="" items={items} grid />
+
+            {totalPages > 1 && (
+              <Pagination page={page} totalPages={totalPages} baseUrl={baseUrl} />
+            )}
+          </>
         )}
       </div>
     );
@@ -162,6 +237,8 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
             key={row.title}
             title={`${row.emoji} ${row.title}`}
             items={row.items}
+            linkHref={`/browse?tag=${encodeURIComponent(row.tag)}`}
+            linkLabel="Voir tout"
           />
         ))}
       </div>
